@@ -1,14 +1,20 @@
+add_library(display STATIC
+  DisplayComponent.cpp DisplayComponent.h
+  DisplayManager.cpp DisplayManager.h
+)
+
 if(APPLE)
-  add_subdirectory(osx)
+  target_sources(display PRIVATE osx/Display.mm osx/Display.h)
 elseif(BUILD_TARGET STREQUAL "RPI")
-  add_subdirectory(rpi)
+  target_sources(display PRIVATE rpi/Display.cpp rpi/Display.h)
 elseif(X11XRANDR_FOUND)
-  add_subdirectory(x11)
+  target_sources(display PRIVATE x11/Display.cpp x11/Display.h)
 elseif(WIN32)
-  add_subdirectory(win)
+  target_sources(display PRIVATE win/Display.cpp win/Display.h)
+else()
+  target_sources(display PRIVATE dummy/Display.cpp dummy/Display.h)
 endif()
 
-add_subdirectory(dummy)
-
-find_all_sources(. SRC)
-add_sources(${SRC})
+target_include_directories(display PUBLIC .)
+std_target_properties(display)
+clang_tidy(display)

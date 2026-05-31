@@ -14,4 +14,4 @@ public:
   explicit ErrorMessage(const QString& errorMessage, bool allowResetConfig = false);
 };
 
-#endif //PLEXMEDIAPLAYER_ERRORMESSAGE_H
+#endif // PLEXMEDIAPLAYER_ERRORMESSAGE_H

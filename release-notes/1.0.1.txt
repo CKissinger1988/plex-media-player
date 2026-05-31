@@ -20,6 +20,6 @@ FIXES:
   - Use exclusive audio setting on OSX by default (related to the USB audio problem, if you want multichannel
     PCM on any device on OSX, you need to reset settings or enable exclusive mode under advanced).
   - Experimental better alt+tab handling on windows.
-  - Fixed issue where the remote controllers might not find PMP
+  - Fixed issue where the remote controllers might not find SAM
   - Fixed issue with playback on some channels
   - Raspberry fixes for 10bit and high h264 level video content

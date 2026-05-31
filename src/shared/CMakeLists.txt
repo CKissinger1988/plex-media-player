@@ -1,5 +1,3 @@
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
 add_library(shared STATIC
   Paths.cpp Paths.h
   LocalJsonClient.cpp LocalJsonClient.h
@@ -10,5 +8,6 @@ add_library(shared STATIC
 )
 
 std_target_properties(shared)
+target_include_directories(shared PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
 clang_tidy(shared)

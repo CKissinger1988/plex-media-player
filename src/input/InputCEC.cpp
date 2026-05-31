@@ -1,8 +1,8 @@
 
-#include "QsLog.h"
 #include "InputCEC.h"
-#include "settings/SettingsComponent.h"
+#include "QsLog.h"
 #include "power/PowerComponent.h"
+#include "settings/SettingsComponent.h"
 
 struct KeyAction
 {
@@ -10,43 +10,43 @@ struct KeyAction
   bool hasLongPress;
 };
 
-static QMap<int, KeyAction> g_cecKeyMap   { \
-                                        { CEC_USER_CONTROL_CODE_SELECT , { INPUT_KEY_SELECT , false } } , \
-                                        { CEC_USER_CONTROL_CODE_UP , { INPUT_KEY_UP , false } } , \
-                                        { CEC_USER_CONTROL_CODE_DOWN , { INPUT_KEY_DOWN , false } } , \
-                                        { CEC_USER_CONTROL_CODE_LEFT , { INPUT_KEY_LEFT , false } } , \
-                                        { CEC_USER_CONTROL_CODE_RIGHT , { INPUT_KEY_RIGHT , false } } , \
-                                        { CEC_USER_CONTROL_CODE_SETUP_MENU , { INPUT_KEY_MENU , false } } , \
-                                        { CEC_USER_CONTROL_CODE_PLAY , { INPUT_KEY_PLAY , false } } , \
-                                        { CEC_USER_CONTROL_CODE_PAUSE , { INPUT_KEY_PAUSE , false } } , \
-                                        { CEC_USER_CONTROL_CODE_STOP , { INPUT_KEY_STOP , false } } , \
-                                        { CEC_USER_CONTROL_CODE_EXIT , { INPUT_KEY_BACK , false } } , \
-                                        { CEC_USER_CONTROL_CODE_FAST_FORWARD , { INPUT_KEY_SEEKFWD , false } } , \
-                                        { CEC_USER_CONTROL_CODE_REWIND , { INPUT_KEY_SEEKBCK , false } } , \
-                                        { CEC_USER_CONTROL_CODE_DISPLAY_INFORMATION , { INPUT_KEY_INFO , false } } , \
-                                        { CEC_USER_CONTROL_CODE_FORWARD , { INPUT_KEY_NEXT , false } } , \
-                                        { CEC_USER_CONTROL_CODE_BACKWARD , { INPUT_KEY_PREV , false } } , \
-                                        { CEC_USER_CONTROL_CODE_F1_BLUE , { INPUT_KEY_BLUE , false } } , \
-                                        { CEC_USER_CONTROL_CODE_F2_RED , { INPUT_KEY_RED , false } } , \
-                                        { CEC_USER_CONTROL_CODE_F3_GREEN , { INPUT_KEY_GREEN , false } } , \
-                                        { CEC_USER_CONTROL_CODE_F4_YELLOW , { INPUT_KEY_YELLOW , false } } , \
-                                        { CEC_USER_CONTROL_CODE_SUB_PICTURE, { INPUT_KEY_SUBTITLES , false } } , \
-                                        { CEC_USER_CONTROL_CODE_ROOT_MENU, { INPUT_KEY_HOME , false } }, \
-                                        { CEC_USER_CONTROL_CODE_NUMBER0, { INPUT_KEY_0 , false } } ,  \
-                                        { CEC_USER_CONTROL_CODE_NUMBER1, { INPUT_KEY_1 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER2, { INPUT_KEY_2 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER3, { INPUT_KEY_3 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER4, { INPUT_KEY_4 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER5, { INPUT_KEY_5 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER6, { INPUT_KEY_6 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER7, { INPUT_KEY_7 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER8, { INPUT_KEY_8 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_NUMBER9, { INPUT_KEY_9 , false } } , \
-                                        { CEC_USER_CONTROL_CODE_ELECTRONIC_PROGRAM_GUIDE, { INPUT_KEY_GUIDE , false } } \
-                                        };
+static QMap<int, KeyAction> g_cecKeyMap{
+  { CEC_USER_CONTROL_CODE_SELECT, { INPUT_KEY_SELECT, false } },
+  { CEC_USER_CONTROL_CODE_UP, { INPUT_KEY_UP, false } },
+  { CEC_USER_CONTROL_CODE_DOWN, { INPUT_KEY_DOWN, false } },
+  { CEC_USER_CONTROL_CODE_LEFT, { INPUT_KEY_LEFT, false } },
+  { CEC_USER_CONTROL_CODE_RIGHT, { INPUT_KEY_RIGHT, false } },
+  { CEC_USER_CONTROL_CODE_SETUP_MENU, { INPUT_KEY_MENU, false } },
+  { CEC_USER_CONTROL_CODE_PLAY, { INPUT_KEY_PLAY, false } },
+  { CEC_USER_CONTROL_CODE_PAUSE, { INPUT_KEY_PAUSE, false } },
+  { CEC_USER_CONTROL_CODE_STOP, { INPUT_KEY_STOP, false } },
+  { CEC_USER_CONTROL_CODE_EXIT, { INPUT_KEY_BACK, false } },
+  { CEC_USER_CONTROL_CODE_FAST_FORWARD, { INPUT_KEY_SEEKFWD, false } },
+  { CEC_USER_CONTROL_CODE_REWIND, { INPUT_KEY_SEEKBCK, false } },
+  { CEC_USER_CONTROL_CODE_DISPLAY_INFORMATION, { INPUT_KEY_INFO, false } },
+  { CEC_USER_CONTROL_CODE_FORWARD, { INPUT_KEY_NEXT, false } },
+  { CEC_USER_CONTROL_CODE_BACKWARD, { INPUT_KEY_PREV, false } },
+  { CEC_USER_CONTROL_CODE_F1_BLUE, { INPUT_KEY_BLUE, false } },
+  { CEC_USER_CONTROL_CODE_F2_RED, { INPUT_KEY_RED, false } },
+  { CEC_USER_CONTROL_CODE_F3_GREEN, { INPUT_KEY_GREEN, false } },
+  { CEC_USER_CONTROL_CODE_F4_YELLOW, { INPUT_KEY_YELLOW, false } },
+  { CEC_USER_CONTROL_CODE_SUB_PICTURE, { INPUT_KEY_SUBTITLES, false } },
+  { CEC_USER_CONTROL_CODE_ROOT_MENU, { INPUT_KEY_HOME, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER0, { INPUT_KEY_0, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER1, { INPUT_KEY_1, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER2, { INPUT_KEY_2, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER3, { INPUT_KEY_3, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER4, { INPUT_KEY_4, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER5, { INPUT_KEY_5, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER6, { INPUT_KEY_6, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER7, { INPUT_KEY_7, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER8, { INPUT_KEY_8, false } },
+  { CEC_USER_CONTROL_CODE_NUMBER9, { INPUT_KEY_9, false } },
+  { CEC_USER_CONTROL_CODE_ELECTRONIC_PROGRAM_GUIDE, { INPUT_KEY_GUIDE, false } }
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-InputCEC::InputCEC(QObject *parent) : InputBase(parent)
+InputCEC::InputCEC(QObject* parent) : InputBase(parent)
 {
   m_cecThread = new QThread(this);
   m_cecThread->setObjectName("InputCEC");
@@ -62,7 +62,8 @@ InputCEC::InputCEC(QObject *parent) : InputBase(parent)
 bool InputCEC::initInput()
 {
   bool retVal;
-  QMetaObject::invokeMethod(m_cecWorker, "init", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, retVal));
+  QMetaObject::invokeMethod(m_cecWorker, "init", Qt::BlockingQueuedConnection,
+                            Q_RETURN_ARG(bool, retVal));
 
   return retVal;
 }
@@ -84,7 +85,8 @@ bool InputCECWorker::init()
   m_configuration.Clear();
   m_callbacks.Clear();
 
-  m_verboseLogging = SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "verbose_logging").toBool();
+  m_verboseLogging =
+  SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "verbose_logging").toBool();
 
   m_configuration.clientVersion = LIBCEC_VERSION_CURRENT;
   qstrcpy(m_configuration.strDeviceName, "Plex");
@@ -95,11 +97,13 @@ bool InputCECWorker::init()
   m_configuration.callbackParam = this;
   m_configuration.callbacks = &m_callbacks;
   m_configuration.deviceTypes.Add(CEC_DEVICE_TYPE_RECORDING_DEVICE);
-  m_configuration.bAutodetectAddress =  CEC_DEFAULT_SETTING_AUTODETECT_ADDRESS;
+  m_configuration.bAutodetectAddress = CEC_DEFAULT_SETTING_AUTODETECT_ADDRESS;
   m_configuration.iPhysicalAddress = CEC_PHYSICAL_ADDRESS_TV;
   m_configuration.baseDevice = CECDEVICE_AUDIOSYSTEM;
-  m_configuration.bActivateSource = (uint8_t)SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "activatesource").toBool();
-  m_configuration.iHDMIPort = (quint8)SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "hdmiport").toInt();
+  m_configuration.bActivateSource =
+  (uint8_t)SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "activatesource").toBool();
+  m_configuration.iHDMIPort =
+  (quint8)SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "hdmiport").toInt();
 
   // open libcec
   m_adapter = (ICECAdapter*)CECInitialise(&m_configuration);
@@ -175,16 +179,13 @@ bool InputCECWorker::openAdapter()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-void InputCECWorker::closeAdapter()
-{
-  m_adapterPort.clear();
-}
+void InputCECWorker::closeAdapter() { m_adapterPort.clear(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void InputCECWorker::checkAdapter()
 {
   if (m_adapterPort.isEmpty())
-  {    
+  {
     if (m_adapter)
       m_adapter->Close();
 
@@ -193,7 +194,8 @@ void InputCECWorker::checkAdapter()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputCECWorker::sendReceivedInput(const QString &source, const QString &keycode, InputBase::InputkeyState keyState)
+void InputCECWorker::sendReceivedInput(const QString& source, const QString& keycode,
+                                       InputBase::InputkeyState keyState)
 {
   emit receivedInput(source, keycode, keyState);
 }
@@ -213,9 +215,9 @@ QString InputCECWorker::getCommandString(cec_user_control_code code)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputCECWorker::CecLogMessage(void* cbParam, const cec_log_message *message)
+void InputCECWorker::CecLogMessage(void* cbParam, const cec_log_message* message)
 {
-  auto *cec = static_cast<InputCECWorker*>(cbParam);
+  auto* cec = static_cast<InputCECWorker*>(cbParam);
 
   Q_ASSERT(cec);
 
@@ -251,21 +253,22 @@ void InputCECWorker::CecLogMessage(void* cbParam, const cec_log_message *message
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-QString InputCECWorker::getCommandParamsList(const cec_command *command)
+QString InputCECWorker::getCommandParamsList(const cec_command* command)
 {
   QString output = QString("%1 parameter(s) :").arg(command->parameters.size);
 
   if (command->parameters.size)
   {
-    for (int i=0; i<command->parameters.size; i++)
-      output += QString("[%1]=%2").arg(i).arg(QString::number(command->parameters[i], 16).toUpper());
+    for (int i = 0; i < command->parameters.size; i++)
+      output +=
+      QString("[%1]=%2").arg(i).arg(QString::number(command->parameters[i], 16).toUpper());
   }
 
   return output;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputCECWorker::CecCommand(void *cbParam, const cec_command *command)
+void InputCECWorker::CecCommand(void* cbParam, const cec_command* command)
 {
   QString cmdString, keyCode;
   bool useUpDown = SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "usekeyupdown").toBool();
@@ -274,10 +277,11 @@ void InputCECWorker::CecCommand(void *cbParam, const cec_command *command)
 
   if (cec->m_verboseLogging)
   {
-    QLOG_DEBUG() << "CecCommand received " << QString::number(command->opcode, 16).toUpper() << "," << cec->getCommandParamsList(command);
+    QLOG_DEBUG() << "CecCommand received " << QString::number(command->opcode, 16).toUpper() << ","
+                 << cec->getCommandParamsList(command);
   }
 
-  switch(command->opcode)
+  switch (command->opcode)
   {
     case CEC_OPCODE_PLAY:
       cec->sendReceivedInput(CEC_INPUT_NAME, INPUT_KEY_PLAY, InputBase::KeyPressed);
@@ -286,7 +290,7 @@ void InputCECWorker::CecCommand(void *cbParam, const cec_command *command)
     case CEC_OPCODE_DECK_CONTROL:
       if (command->parameters.size)
       {
-        switch(command->parameters[0])
+        switch (command->parameters[0])
         {
           case CEC_DECK_CONTROL_MODE_SKIP_FORWARD_WIND:
             keyCode = INPUT_KEY_SEEKFWD;
@@ -321,20 +325,21 @@ void InputCECWorker::CecCommand(void *cbParam, const cec_command *command)
       bool down = (command->opcode == CEC_OPCODE_VENDOR_REMOTE_BUTTON_DOWN) ||
                   (command->opcode == CEC_OPCODE_USER_CONTROL_PRESSED);
 
-
       if (cec->m_verboseLogging)
       {
-        QLOG_DEBUG() << "CecCommand button (Down= " << down << ")" << cec->getCommandParamsList(command);
+        QLOG_DEBUG() << "CecCommand button (Down= " << down << ")"
+                     << cec->getCommandParamsList(command);
       }
 
       if (command->parameters.size && down)
       {
-        switch(command->parameters[0])
+        switch (command->parameters[0])
         {
           // samsung Return key
           case CEC_USER_CONTROL_CODE_AN_RETURN:
             if (useUpDown)
-              cec->sendReceivedInput(CEC_INPUT_NAME, INPUT_KEY_BACK, down ? InputBase::KeyDown : InputBase::KeyUp);
+              cec->sendReceivedInput(CEC_INPUT_NAME, INPUT_KEY_BACK,
+                                     down ? InputBase::KeyDown : InputBase::KeyUp);
             else if (down)
               cec->sendReceivedInput(CEC_INPUT_NAME, INPUT_KEY_BACK, InputBase::KeyPressed);
 
@@ -351,31 +356,37 @@ void InputCECWorker::CecCommand(void *cbParam, const cec_command *command)
       if (!cmdString.isEmpty())
       {
         if (useUpDown)
-          cec->sendReceivedInput(CEC_INPUT_NAME, cmdString, down ? InputBase::KeyDown : InputBase::KeyUp);
+          cec->sendReceivedInput(CEC_INPUT_NAME, cmdString,
+                                 down ? InputBase::KeyDown : InputBase::KeyUp);
         else if (down)
           cec->sendReceivedInput(CEC_INPUT_NAME, cmdString, InputBase::KeyPressed);
       }
     }
-      break;
+    break;
 
-    case CEC_OPCODE_GIVE_OSD_NAME:          // ignore those known commands (only pollng from TV)
+    case CEC_OPCODE_GIVE_OSD_NAME: // ignore those known commands (only pollng from TV)
     case CEC_OPCODE_GIVE_PHYSICAL_ADDRESS:
       break;
 
     case CEC_OPCODE_STANDBY:
       QLOG_DEBUG() << "CecCommand : Got a standby Request";
-      if ((SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "suspendonstandby").toBool()) && PowerComponent::Get().canSuspend())
+      if ((SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "suspendonstandby").toBool()) &&
+          PowerComponent::Get().canSuspend())
       {
         PowerComponent::Get().Suspend();
       }
-      else if ((SettingsComponent::Get().value(SETTINGS_SECTION_CEC, "poweroffonstandby").toBool()) && PowerComponent::Get().canPowerOff())
+      else if ((SettingsComponent::Get()
+                .value(SETTINGS_SECTION_CEC, "poweroffonstandby")
+                .toBool()) &&
+               PowerComponent::Get().canPowerOff())
       {
         PowerComponent::Get().PowerOff();
       }
       break;
 
     default:
-      QLOG_DEBUG() << "Unhandled CEC command " << command->opcode << ", " << cec->getCommandParamsList(command);
+      QLOG_DEBUG() << "Unhandled CEC command " << command->opcode << ", "
+                   << cec->getCommandParamsList(command);
       break;
   }
 
@@ -383,7 +394,7 @@ void InputCECWorker::CecCommand(void *cbParam, const cec_command *command)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputCECWorker::CecAlert(void *cbParam, const libcec_alert type, const libcec_parameter param)
+void InputCECWorker::CecAlert(void* cbParam, const libcec_alert type, const libcec_parameter param)
 {
   bool reopen = false;
 

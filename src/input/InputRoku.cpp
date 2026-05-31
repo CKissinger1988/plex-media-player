@@ -5,12 +5,12 @@
 #include "InputRoku.h"
 #include "QsLog.h"
 
-#include "qhttpserverresponse.hpp"
 #include "qhttpserverrequest.hpp"
+#include "qhttpserverresponse.hpp"
 
-#include <QUrl>
-#include <QUdpSocket>
 #include <QTimeZone>
+#include <QUdpSocket>
+#include <QUrl>
 #include <QXmlStreamWriter>
 
 using namespace qhttp::server;
@@ -31,7 +31,8 @@ bool InputRoku::initInput()
   connect(m_server, &QHttpServer::newRequest, this, &InputRoku::handleRequest);
 
   m_ssdpSocket = new QUdpSocket(this);
-  if (!m_ssdpSocket->bind(QHostAddress::AnyIPv4, 1900, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress))
+  if (!m_ssdpSocket->bind(QHostAddress::AnyIPv4, 1900,
+                          QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress))
   {
     QLOG_WARN() << "Failed to bind to SSDP socket";
     return false;
@@ -108,7 +109,8 @@ void InputRoku::handleRequest(QHttpRequest* request, QHttpResponse* response)
   {
     handleQueryDeviceInfo(request, response);
   }
-  else if (path.startsWith("/keypress/") || path.startsWith("/keydown/") || path.startsWith("/keyup/"))
+  else if (path.startsWith("/keypress/") || path.startsWith("/keydown/") ||
+           path.startsWith("/keyup/"))
   {
     handleKeyPress(request, response);
   }
@@ -137,7 +139,7 @@ void InputRoku::handleQueryApps(QHttpRequest* request, QHttpResponse* response)
   writer.writeStartElement("apps");
   writer.writeStartElement("app");
   writer.writeAttribute("id", "1");
-  writer.writeCharacters("Plex Media Player");
+  writer.writeCharacters("SpartanAI-Media");
   writer.writeEndElement(); // app
   writer.writeEndElement(); // apps
   writer.writeEndDocument();
@@ -179,8 +181,10 @@ void InputRoku::handleQueryDeviceInfo(QHttpRequest* request, QHttpResponse* resp
   writer.writeTextElement("locale", locale.name());
 
   QTimeZone tz = QTimeZone::systemTimeZone();
-  writer.writeTextElement("time-zone", tz.displayName(QTimeZone::StandardTime, QTimeZone::LongName));
-  writer.writeTextElement("time-zone-offset", QString::number(tz.offsetFromUtc(QDateTime::currentDateTime()) / 60));
+  writer.writeTextElement("time-zone",
+                          tz.displayName(QTimeZone::StandardTime, QTimeZone::LongName));
+  writer.writeTextElement("time-zone-offset",
+                          QString::number(tz.offsetFromUtc(QDateTime::currentDateTime()) / 60));
   writer.writeEndElement(); // device-info
   writer.writeEndDocument();
 
@@ -208,7 +212,6 @@ void InputRoku::handleKeyPress(QHttpRequest* request, QHttpResponse* response)
     emit receivedInput("roku", pathsplit.value(2), KeyUp);
   else if (url.startsWith("/keypress/"))
     emit receivedInput("roku", pathsplit.value(2), KeyPressed);
-
 
   response->setStatusCode(qhttp::ESTATUS_OK);
   response->end();

@@ -1,10 +1,9 @@
 #ifndef __INPUT_APPLE_REMOTE_H__
 #define __INPUT_APPLE_REMOTE_H__
 
+#include "input/InputComponent.h"
 #include <QObject>
 #include <QString>
-#include "input/InputComponent.h"
-
 
 #ifdef __OBJC__
 @class AppleRemoteDelegate;
@@ -16,12 +15,12 @@ typedef void delegate;
 class InputAppleRemote : public InputBase
 {
 public:
-  explicit InputAppleRemote(QObject* parent = nullptr) : InputBase(parent), m_remoteID(0) { }
+  explicit InputAppleRemote(QObject* parent = nullptr) : InputBase(parent), m_remoteID(0) {}
   const char* inputName() override { return "AppleRemote"; }
   bool initInput() override;
-  
+
   void remoteButtonEvent(quint8 code, bool pressed, const QString& name);
-  
+
   void addRemote(const QString& name);
   void removeRemote(const QString& name);
   void addRemoteFailed(const QString& error);

@@ -6,9 +6,9 @@
 //
 //
 
-#include <CoreGraphics/CoreGraphics.h>
-#include "utils/osx/OSXUtils.h"
 #include "DisplayManagerOSX.h"
+#include "utils/osx/OSXUtils.h"
+#include <CoreGraphics/CoreGraphics.h>
 
 #include "QsLog.h"
 
@@ -51,7 +51,7 @@ bool DisplayManagerOSX::initialize()
     for (int modeid = 0; modeid < numModes; modeid++)
     {
       totalModes++;
-      
+
       // add the videomode to the display
       DMVideoModePtr mode = DMVideoModePtr(new DMVideoMode);
       mode->m_id = modeid;
@@ -67,11 +67,14 @@ bool DisplayManagerOSX::initialize()
 
       CFStringRef pixEnc = CGDisplayModeCopyPixelEncoding(displayMode);
 
-      if (CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+      if (CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) ==
+          kCFCompareEqualTo)
         mode->m_bitsPerPixel = 32;
-      else if (CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+      else if (CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) ==
+               kCFCompareEqualTo)
         mode->m_bitsPerPixel = 16;
-      else if (CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+      else if (CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) ==
+               kCFCompareEqualTo)
         mode->m_bitsPerPixel = 8;
 
       CFRelease(pixEnc);
@@ -94,7 +97,7 @@ bool DisplayManagerOSX::setDisplayMode(int display, int mode)
 {
   if (!isValidDisplayMode(display, mode) || !m_osxDisplayModes[display])
     return false;
-  
+
   CGDisplayModeRef displayMode =
   (CGDisplayModeRef)CFArrayGetValueAtIndex(m_osxDisplayModes[display], mode);
 
@@ -113,13 +116,14 @@ int DisplayManagerOSX::getCurrentDisplayMode(int display)
 {
   if (!isValidDisplay(display) || !m_osxDisplayModes[display])
     return -1;
-  
+
   CGDisplayModeRef currentMode = CGDisplayCopyDisplayMode(m_osxDisplays[display]);
   uint32_t currentIOKitID = CGDisplayModeGetIODisplayModeID(currentMode);
 
   for (int mode = 0; mode < CFArrayGetCount(m_osxDisplayModes[display]); mode++)
   {
-    CGDisplayModeRef checkMode = (CGDisplayModeRef)CFArrayGetValueAtIndex(m_osxDisplayModes[display], mode);
+    CGDisplayModeRef checkMode =
+    (CGDisplayModeRef)CFArrayGetValueAtIndex(m_osxDisplayModes[display], mode);
     uint32_t checkIOKitID = CGDisplayModeGetIODisplayModeID(checkMode);
 
     if (currentIOKitID == checkIOKitID)
@@ -166,7 +170,7 @@ int DisplayManagerOSX::getDisplayFromPoint(int x, int y)
 
   CGGetDisplaysWithPoint(point, 1, &foundDisplay, &numFound);
 
-  for (int i=0; i<m_osxnumDisplays; i++)
+  for (int i = 0; i < m_osxnumDisplays; i++)
   {
     if (foundDisplay == m_osxDisplays[i])
       return i;

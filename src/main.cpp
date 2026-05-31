@@ -1,32 +1,31 @@
 #include <locale.h>
 
-#include <QGuiApplication>
 #include <QApplication>
+#include <QCommandLineOption>
+#include <QErrorMessage>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QIcon>
 #include <QtQml>
 #include <QtWebEngine/qtwebengineglobal.h>
-#include <QErrorMessage>
-#include <QCommandLineOption>
 
+#include "Globals.h"
+#include "Paths.h"
+#include "QsLog.h"
+#include "UniqueApplication.h"
+#include "Version.h"
+#include "breakpad/CrashDumps.h"
+#include "player/CodecsComponent.h"
+#include "player/OpenGLDetect.h"
+#include "player/PlayerComponent.h"
+#include "settings/SettingsComponent.h"
+#include "settings/SettingsSection.h"
 #include "shared/Names.h"
 #include "system/SystemComponent.h"
 #include "system/UpdateManager.h"
 #include "system/UpdaterComponent.h"
-#include "QsLog.h"
-#include "Paths.h"
-#include "player/CodecsComponent.h"
-#include "player/PlayerComponent.h"
-#include "player/OpenGLDetect.h"
-#include "breakpad/CrashDumps.h"
-#include "Version.h"
-#include "settings/SettingsComponent.h"
-#include "settings/SettingsSection.h"
-#include "ui/KonvergoWindow.h"
-#include "ui/KonvergoWindow.h"
-#include "Globals.h"
 #include "ui/ErrorMessage.h"
-#include "UniqueApplication.h"
+#include "ui/KonvergoWindow.h"
 #include "utils/HelperLauncher.h"
 #include "utils/Log.h"
 
@@ -61,14 +60,14 @@ static void preinitQt()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-char** appendCommandLineArguments(int argc, char **argv, const QStringList& args)
+char** appendCommandLineArguments(int argc, char** argv, const QStringList& args)
 {
   size_t newSize = (argc + args.length() + 1) * sizeof(char*);
   char** newArgv = (char**)calloc(1, newSize);
   memcpy(newArgv, argv, (size_t)(argc * sizeof(char*)));
 
   int pos = argc;
-  for(const QString& str : args)
+  for (const QString& str : args)
     newArgv[pos++] = qstrdup(str.toUtf8().data());
 
   return newArgv;
@@ -84,37 +83,35 @@ void ShowLicenseInfo()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-QStringList g_qtFlags = {
-  "--disable-gpu",
-  "--disable-web-security"
-};
+QStringList g_qtFlags = { "--disable-gpu", "--disable-web-security" };
 
 /////////////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   try
   {
     QCommandLineParser parser;
-    parser.setApplicationDescription("Plex Media Player");
+    parser.setApplicationDescription("SpartanAI-Media");
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addOptions({{{"l", "licenses"},         "Show license information"},
-                       {{"a", "from-auto-update"}, "When invoked from auto-update"},
-                       {"desktop",                 "Start in desktop mode"},
-                       {"tv",                      "Start in TV mode"},
-                       {"auto-layout",             "Use auto-layout mode"},
-                       {"windowed",                "Start in windowed mode"},
-                       {"fullscreen",              "Start in fullscreen"},
-                       {"no-updates",              "Disable auto-updating"},
-                       {"terminal",                "Log to terminal"}});
+    parser.addOptions({ { { "l", "licenses" }, "Show license information" },
+                        { { "a", "from-auto-update" }, "When invoked from auto-update" },
+                        { "desktop", "Start in desktop mode" },
+                        { "tv", "Start in TV mode" },
+                        { "auto-layout", "Use auto-layout mode" },
+                        { "windowed", "Start in windowed mode" },
+                        { "fullscreen", "Start in fullscreen" },
+                        { "no-updates", "Disable auto-updating" },
+                        { "terminal", "Log to terminal" } });
 
-    auto scaleOption = QCommandLineOption("scale-factor", "Set to a integer or default auto which controls" \
-                                                          "the scale (DPI) of the desktop interface.");
+    auto scaleOption =
+    QCommandLineOption("scale-factor", "Set to a integer or default auto which controls"
+                                       "the scale (DPI) of the desktop interface.");
     scaleOption.setValueName("scale");
     scaleOption.setDefaultValue("auto");
     parser.addOption(scaleOption);
 
-    char **newArgv = appendCommandLineArguments(argc, argv, g_qtFlags);
+    char** newArgv = appendCommandLineArguments(argc, argv, g_qtFlags);
     int newArgc = argc + g_qtFlags.size();
 
     // Qt calls setlocale(LC_ALL, "") in a bunch of places, which breaks
@@ -216,7 +213,7 @@ int main(int argc, char *argv[])
     HelperLauncher::Get().connectToHelper();
 #endif
     // load QtWebChannel so that we can register our components with it.
-    QQmlApplicationEngine *engine = Globals::Engine();
+    QQmlApplicationEngine* engine = Globals::Engine();
 
     KonvergoWindow::RegisterClass();
     Globals::SetContextProperty("components", &ComponentManager::Get().getQmlPropertyMap());
@@ -225,7 +222,9 @@ int main(int argc, char *argv[])
     // if we get a valid object passed to it. Any error messages will be reported on stderr
     // but since no normal user should ever see this it should be fine
     //
-    QObject::connect(engine, &QQmlApplicationEngine::objectCreated, [=](QObject* object, const QUrl& url)
+    QObject::connect(
+    engine, &QQmlApplicationEngine::objectCreated,
+    [=](QObject* object, const QUrl& url)
     {
       Q_UNUSED(url);
 
@@ -238,7 +237,8 @@ int main(int argc, char *argv[])
       Q_ASSERT(webChannel);
       ComponentManager::Get().setWebChannel(qobject_cast<QWebChannel*>(webChannel));
 
-      QObject::connect(uniqueApp, &UniqueApplication::otherApplicationStarted, window, &KonvergoWindow::otherAppFocus);
+      QObject::connect(uniqueApp, &UniqueApplication::otherApplicationStarted, window,
+                       &KonvergoWindow::otherAppFocus);
     });
     engine->load(QUrl(QStringLiteral("qrc:/ui/webview.qml")));
 
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
     QLOG_FATAL() << "Unhandled FatalException:" << qPrintable(e.message());
     QApplication errApp(argc, argv);
 
-    auto  msg = new ErrorMessage(e.message(), true);
+    auto msg = new ErrorMessage(e.message(), true);
     msg->show();
 
     errApp.exec();

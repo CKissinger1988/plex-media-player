@@ -1,19 +1,19 @@
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 
+#include <QMimeDatabase>
 #include <QObject>
 #include <QString>
-#include <QMimeDatabase>
 
-#include "qhttpserverrequest.hpp"
 #include "qhttpserver.hpp"
+#include "qhttpserverrequest.hpp"
 #include "qhttpserverresponse.hpp"
 
 using namespace qhttp::server;
 
 class HttpServer : public QObject
 {
-Q_OBJECT
+  Q_OBJECT
 public:
   explicit HttpServer(QObject* parent);
   bool start();

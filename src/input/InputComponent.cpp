@@ -1,15 +1,15 @@
-#include "QsLog.h"
 #include "InputComponent.h"
+#include "InputKeyboard.h"
+#include "InputRoku.h"
+#include "InputSocket.h"
+#include "QsLog.h"
+#include "power/PowerComponent.h"
 #include "settings/SettingsComponent.h"
 #include "system/SystemComponent.h"
-#include "power/PowerComponent.h"
-#include "InputKeyboard.h"
-#include "InputSocket.h"
-#include "InputRoku.h"
 
 #ifdef Q_OS_MAC
-#include "apple/InputAppleRemote.h"
 #include "apple/InputAppleMediaKeys.h"
+#include "apple/InputAppleRemote.h"
 #endif
 
 #ifdef HAVE_SDL
@@ -31,7 +31,8 @@
 // half of the fastest press-and-release time. Empirical key repeat intervals:
 //   * Key hold on macOS wireless USB keyboard with fastest key repeat preference: ~35s
 //   * Press and release on macOS wireless USB keyboard (like a meth monkey): ~120ms
-//   * Key hold on macOS Apple TV IR remote + FLiRC (3.8 firmware) with fastest key repeat preference: ~35s
+//   * Key hold on macOS Apple TV IR remote + FLiRC (3.8 firmware) with fastest key repeat
+//   preference: ~35s
 //   * Press and release on macOS Apple TV IR remote + FLiRC (3.8 firmware): ~150ms
 //
 #define AUTOREPEAT_MSEC 60
@@ -62,16 +63,17 @@ bool InputComponent::addInput(InputBase* base)
   // for auto-repeating inputs
   //
   m_autoRepeatTimer = new QTimer(this);
-  connect(m_autoRepeatTimer, &QTimer::timeout, [=]()
-  {
-    if (!m_autoRepeatActions.isEmpty())
-    {
-      QLOG_DEBUG() << "Emit input action (autorepeat):" << m_autoRepeatActions;
-      emit hostInput(m_autoRepeatActions);
-    }
+  connect(m_autoRepeatTimer, &QTimer::timeout,
+          [=]()
+          {
+            if (!m_autoRepeatActions.isEmpty())
+            {
+              QLOG_DEBUG() << "Emit input action (autorepeat):" << m_autoRepeatActions;
+              emit hostInput(m_autoRepeatActions);
+            }
 
-    m_autoRepeatTimer->setInterval(AUTOREPEAT_MSEC);
-  });
+            m_autoRepeatTimer->setInterval(AUTOREPEAT_MSEC);
+          });
 
   return true;
 }
@@ -155,7 +157,8 @@ void InputComponent::handleAction(const QString& action)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputComponent::remapInput(const QString &source, const QString &keycode, InputBase::InputkeyState keyState)
+void InputComponent::remapInput(const QString& source, const QString& keycode,
+                                InputBase::InputkeyState keyState)
 {
   QLOG_DEBUG() << "Input received: source:" << source << "keycode:" << keycode << ":" << keyState;
 
@@ -178,7 +181,7 @@ void InputComponent::remapInput(const QString &source, const QString &keycode, I
       m_currentLongPressAction.clear();
 
       QLOG_DEBUG() << "Emit input action (" + type + "):" << action;
-      emit hostInput(QStringList{action});
+      emit hostInput(QStringList{ action });
     }
 
     return;
@@ -245,15 +248,17 @@ void InputComponent::executeActions(const QStringList& actions)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void InputComponent::registerHostCommand(const QString& command, QObject* receiver, const char* slot)
+void InputComponent::registerHostCommand(const QString& command, QObject* receiver,
+                                         const char* slot)
 {
-  auto  recvSlot = new ReceiverSlot;
+  auto recvSlot = new ReceiverSlot;
   recvSlot->m_receiver = receiver;
   recvSlot->m_slot = QMetaObject::normalizedSignature(slot);
   recvSlot->m_hasArguments = false;
 
   QLOG_DEBUG() << "Adding host command:" << qPrintable(command) << "mapped to"
-               << qPrintable(QString(receiver->metaObject()->className()) + "::" + recvSlot->m_slot);
+               << qPrintable(QString(receiver->metaObject()->className()) +
+                             "::" + recvSlot->m_slot);
 
   m_hostCommands.insert(command, recvSlot);
 

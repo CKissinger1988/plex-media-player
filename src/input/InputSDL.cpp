@@ -6,9 +6,9 @@
 //
 //
 
-#include <QKeyEvent>
 #include "InputSDL.h"
 #include "QsLog.h"
+#include <QKeyEvent>
 
 #include <climits>
 #include <cstdlib>
@@ -83,13 +83,16 @@ void InputSDLWorker::run()
 
         case SDL_JOYBUTTONDOWN:
         {
-          emit receivedInput(nameForId(event.jbutton.which), QString("KEY_BUTTON_%1").arg(event.jbutton.button), InputBase::KeyDown);
+          emit receivedInput(nameForId(event.jbutton.which),
+                             QString("KEY_BUTTON_%1").arg(event.jbutton.button),
+                             InputBase::KeyDown);
           break;
         }
 
         case SDL_JOYBUTTONUP:
         {
-          emit receivedInput(nameForId(event.jbutton.which), QString("KEY_BUTTON_%1").arg(event.jbutton.button), InputBase::KeyUp);
+          emit receivedInput(nameForId(event.jbutton.which),
+                             QString("KEY_BUTTON_%1").arg(event.jbutton.button), InputBase::KeyUp);
           break;
         }
 
@@ -140,7 +143,8 @@ void InputSDLWorker::run()
 
           m_lastHat = hatName;
 
-          emit receivedInput(nameForId(event.jhat.which), hatName, pressed ? InputBase::KeyDown : InputBase::KeyUp);
+          emit receivedInput(nameForId(event.jhat.which), hatName,
+                             pressed ? InputBase::KeyDown : InputBase::KeyUp);
 
           break;
         }
@@ -158,18 +162,26 @@ void InputSDLWorker::run()
             bool up = value < 0;
             if (!m_axisState.contains(axis))
             {
-              emit receivedInput(nameForId(event.jaxis.which), QString("KEY_AXIS_%1_%2").arg(axis).arg(up ? "UP" : "DOWN"), InputBase::KeyDown);
+              emit receivedInput(nameForId(event.jaxis.which),
+                                 QString("KEY_AXIS_%1_%2").arg(axis).arg(up ? "UP" : "DOWN"),
+                                 InputBase::KeyDown);
               m_axisState.insert(axis, up);
             }
             else if (m_axisState.value(axis) != up)
             {
-              emit receivedInput(nameForId(event.jaxis.which), QString("KEY_AXIS_%1_%2").arg(axis).arg(m_axisState.value(axis) ? "UP" : "DOWN"), InputBase::KeyUp);
+              emit receivedInput(
+              nameForId(event.jaxis.which),
+              QString("KEY_AXIS_%1_%2").arg(axis).arg(m_axisState.value(axis) ? "UP" : "DOWN"),
+              InputBase::KeyUp);
               m_axisState.remove(axis);
             }
           }
           else if (std::abs(value) < 10000 && m_axisState.contains(axis)) // back to the center.
           {
-            emit receivedInput(nameForId(event.jaxis.which), QString("KEY_AXIS_%1_%2").arg(axis).arg(m_axisState.value(axis) ? "UP" : "DOWN"), InputBase::KeyUp);
+            emit receivedInput(
+            nameForId(event.jaxis.which),
+            QString("KEY_AXIS_%1_%2").arg(axis).arg(m_axisState.value(axis) ? "UP" : "DOWN"),
+            InputBase::KeyUp);
             m_axisState.remove(axis);
           }
           break;
@@ -214,8 +226,8 @@ void InputSDLWorker::refreshJoystickList()
     {
       int instanceid = SDL_JoystickInstanceID(joystick);
       QLOG_INFO() << "JoyStick #" << instanceid << " is " << SDL_JoystickName(joystick) << " with "
-                  << SDL_JoystickNumButtons(joystick) << " buttons and " << SDL_JoystickNumAxes(joystick)
-                  << "axes";
+                  << SDL_JoystickNumButtons(joystick) << " buttons and "
+                  << SDL_JoystickNumAxes(joystick) << "axes";
       m_joysticks[instanceid] = joystick;
       m_axisState.clear();
     }
@@ -238,7 +250,7 @@ InputSDL::InputSDL(QObject* parent) : InputBase(parent)
 InputSDL::~InputSDL()
 {
   close();
-  
+
   if (m_thread->isRunning())
   {
     m_thread->exit(0);
@@ -260,7 +272,4 @@ bool InputSDL::initInput()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-void InputSDL::close()
-{
-  QMetaObject::invokeMethod(m_sdlworker, "close", Qt::DirectConnection);
-}
+void InputSDL::close() { QMetaObject::invokeMethod(m_sdlworker, "close", Qt::DirectConnection); }

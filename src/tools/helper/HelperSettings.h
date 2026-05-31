@@ -5,15 +5,13 @@
 #ifndef KONVERGO_HELPERSETTINGS_H
 #define KONVERGO_HELPERSETTINGS_H
 
-#include <QSettings>
 #include "Paths.h"
+#include <QSettings>
 
 class HelperSettings : public QSettings
 {
 public:
-  HelperSettings() : QSettings(Paths::dataDir("helper.conf"), QSettings::IniFormat)
-  {
-  }
+  HelperSettings() : QSettings(Paths::dataDir("helper.conf"), QSettings::IniFormat) {}
 };
 
-#endif //KONVERGO_HELPERSETTINGS_H
+#endif // KONVERGO_HELPERSETTINGS_H

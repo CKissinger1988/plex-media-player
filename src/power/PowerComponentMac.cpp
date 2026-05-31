@@ -7,9 +7,7 @@ void PowerComponentMac::doDisableScreensaver()
   {
     CFStringRef why = CFSTR("tv.plex.player");
     IOPMAssertionCreateWithName(kIOPMAssertionTypePreventUserIdleDisplaySleep,
-                                kIOPMAssertionLevelOn,
-                                why,
-                                &m_assertion);
+                                kIOPMAssertionLevelOn, why, &m_assertion);
   }
 }
 
@@ -28,20 +26,19 @@ bool PowerComponentMac::PowerOff()
 {
   OSErr error = OSXUtils::SendAppleEventToSystemProcess(kAEShutDown);
   if (error == noErr)
-    QLOG_DEBUG() <<  "Computer is going to shutdown!";
+    QLOG_DEBUG() << "Computer is going to shutdown!";
   else
     QLOG_DEBUG() << "Computer wouldn't shutdown!";
 
   return (error == noErr);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool PowerComponentMac::Reboot()
 {
   OSErr error = OSXUtils::SendAppleEventToSystemProcess(kAERestart);
   if (error == noErr)
-    QLOG_DEBUG() <<  "Computer is going to reboot!";
+    QLOG_DEBUG() << "Computer is going to reboot!";
   else
     QLOG_DEBUG() << "Computer wouldn't reboot!";
 
@@ -53,7 +50,7 @@ bool PowerComponentMac::Suspend()
 {
   OSErr error = OSXUtils::SendAppleEventToSystemProcess(kAESleep);
   if (error == noErr)
-    QLOG_DEBUG() <<  "Computer is going to sleep!";
+    QLOG_DEBUG() << "Computer is going to sleep!";
   else
     QLOG_DEBUG() << "Computer wouldn't sleep!";
 

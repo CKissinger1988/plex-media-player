@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake libtool libharfbuzz-dev libfreetype6-dev libfontconfig1-dev \
+        libx11-dev libxrandr-dev libvdpau-dev libva-dev mesa-common-dev libegl1-mesa-dev \
+        yasm libasound2-dev libpulse-dev libuchardet-dev zlib1g-dev libfribidi-dev git \
+        libgnutls28-dev libgl1-mesa-dev libsdl2-dev cmake ninja-build qt6-base-dev
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
+
+    - name: Build
+      run: |
+        cd build
+        ninja
+
+    - name: Run Clang-Tidy
+      run: |
+        cd build
+        # Run clang-tidy on the generated compilation database
+        run-clang-tidy -p . -header-filter=.* src/.*

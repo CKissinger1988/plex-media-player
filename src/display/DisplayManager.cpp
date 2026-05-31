@@ -6,8 +6,8 @@
 //
 //
 
-#include "QsLog.h"
 #include "DisplayManager.h"
+#include "QsLog.h"
 #include "math.h"
 #include "settings/SettingsComponent.h"
 
@@ -20,10 +20,11 @@ bool DisplayManager::initialize()
   QLOG_INFO() << QString("DisplayManager found %1 Display(s).").arg(m_displays.size());
 
   // list video modes
-  for(int displayid : m_displays.keys())
+  for (int displayid : m_displays.keys())
   {
     DMDisplayPtr display = m_displays[displayid];
-    QLOG_INFO() << QString("Available modes for Display #%1 (%2)").arg(displayid).arg(display->m_name);
+    QLOG_INFO()
+    << QString("Available modes for Display #%1 (%2)").arg(displayid).arg(display->m_name);
     for (int modeid = 0; modeid < display->m_videoModes.size(); modeid++)
     {
       DMVideoModePtr mode = display->m_videoModes[modeid];
@@ -83,7 +84,7 @@ bool DisplayManager::isRateMultipleOf(float refresh, float multiple, bool exact)
   long roundedMultiple = lrint(multiple);
 
   if (roundedRefresh == 0)
-      return false;
+    return false;
 
   long factor = roundedMultiple / roundedRefresh;
   float newRate = factor * refresh;
@@ -98,7 +99,8 @@ bool DisplayManager::isRateMultipleOf(float refresh, float multiple, bool exact)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int DisplayManager::findBestMatch(int display, DMMatchMediaInfo& matchInfo)
 {
-  bool avoid_25_30 = SettingsComponent::Get().value(SETTINGS_SECTION_VIDEO, "refreshrate.avoid_25hz_30hz").toBool();
+  bool avoid_25_30 =
+  SettingsComponent::Get().value(SETTINGS_SECTION_VIDEO, "refreshrate.avoid_25hz_30hz").toBool();
 
   // Grab current videomode information
   DMVideoModePtr currentVideoMode = getCurrentVideoMode(display);
@@ -122,7 +124,8 @@ int DisplayManager::findBestMatch(int display, DMMatchMediaInfo& matchInfo)
     {
       if (avoid_25_30)
       {
-        QLOG_INFO() << "DisplayManager RefreshMatch : skipping rate " << candidate->m_refreshRate << "as requested";
+        QLOG_INFO() << "DisplayManager RefreshMatch : skipping rate " << candidate->m_refreshRate
+                    << "as requested";
         modeit++;
         continue;
       }
@@ -204,7 +207,7 @@ int DisplayManager::findBestMode(int display)
 {
   int bestMode = -1;
 
-  for(auto mode : m_displays[display]->m_videoModes)
+  for (auto mode : m_displays[display]->m_videoModes)
   {
     if (bestMode < 0)
     {

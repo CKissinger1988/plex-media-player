@@ -6,11 +6,11 @@
 class OEUpdateManager : public UpdateManager
 {
 public:
-  explicit OEUpdateManager(QObject *parent = nullptr) {};
+  explicit OEUpdateManager(QObject* parent = nullptr) {};
   ~OEUpdateManager() override {};
 
   QString HaveUpdate() override;
-  bool applyUpdate(const QString &version) override;
+  bool applyUpdate(const QString& version) override;
   void doUpdate(const QString& version) override;
 
 private:

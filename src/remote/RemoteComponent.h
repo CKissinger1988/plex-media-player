@@ -7,16 +7,16 @@
 
 #include <QJsonObject>
 #include <QMutex>
-#include <QTimer>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QTimer>
 
 #include "ComponentManager.h"
 #include "GDMManager.h"
-#include "server/HTTPServer.h"
-#include "qhttpserverresponse.hpp"
-#include "qhttpserver.hpp"
 #include "RemoteSubscriber.h"
+#include "qhttpserver.hpp"
+#include "qhttpserverresponse.hpp"
+#include "server/HTTPServer.h"
 
 class RemoteComponent : public ComponentBase
 {
@@ -37,7 +37,7 @@ public:
   void handleResource(QHttpRequest* request, QHttpResponse* response);
   void handleCommand(QHttpRequest* request, QHttpResponse* response);
 
-  static QVariantMap HeaderToMap(const qhttp::THeaderHash& hash, const QUrl *url = nullptr);
+  static QVariantMap HeaderToMap(const qhttp::THeaderHash& hash, const QUrl* url = nullptr);
   static QVariantMap QueryToMap(const QUrl& url);
 
   Q_INVOKABLE void commandResponse(const QVariantMap& responseArguments);
@@ -56,7 +56,7 @@ private Q_SLOTS:
 
 private:
   explicit RemoteComponent(QObject* parent = nullptr);
-  void handleSubscription(QHttpRequest * request, QHttpResponse * response, bool poll=false);
+  void handleSubscription(QHttpRequest* request, QHttpResponse* response, bool poll = false);
   void subscribeToWeb(bool subscribe);
 
   GDMManager* m_gdmManager;
@@ -70,6 +70,5 @@ private:
   QTimer m_subscriberTimer;
   QNetworkAccessManager* m_networkAccessManager;
 };
-
 
 #endif //_KONVERGO_REMOTECOMPONENT_H_

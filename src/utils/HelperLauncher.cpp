@@ -3,26 +3,25 @@
 //
 
 #include "HelperLauncher.h"
+#include "Names.h"
 #include "QsLog.h"
 #include "settings/SettingsComponent.h"
 #include "settings/SettingsSection.h"
 #include "utils/Utils.h"
-#include "Names.h"
 
 #include <QTimer>
 
 /////////////////////////////////////////////////////////////////////////////////////////
-HelperLauncher::HelperLauncher(QObject* parent) : QObject(parent)
-{
-  start();
-}
+HelperLauncher::HelperLauncher(QObject* parent) : QObject(parent) { start(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void HelperLauncher::start()
 {
-  m_jsonClient = new LocalJsonClient("pmpHelper");
+  m_jsonClient = new LocalJsonClient("samHelper");
   connect(m_jsonClient, &QLocalSocket::connected, this, &HelperLauncher::didConnect);
-  connect(m_jsonClient, static_cast<void (QLocalSocket::*)(QLocalSocket::LocalSocketError)>(&QLocalSocket::error), this, &HelperLauncher::socketError);
+  connect(m_jsonClient,
+          static_cast<void (QLocalSocket::*)(QLocalSocket::LocalSocketError)>(&QLocalSocket::error),
+          this, &HelperLauncher::socketError);
   connect(m_jsonClient, &LocalJsonClient::messageReceived, this, &HelperLauncher::gotMessage);
   connect(m_jsonClient, &QLocalSocket::disconnected, this, &HelperLauncher::socketDisconnect);
 
@@ -32,11 +31,13 @@ void HelperLauncher::start()
 
   m_helperProcess = new QProcess(this);
 
-  connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_WEBCLIENT), &SettingsSection::valuesUpdated, [=](const QVariantMap& values)
-  {
-    if (values.contains("clientID"))
-      updateClientId();
-  });
+  connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_WEBCLIENT),
+          &SettingsSection::valuesUpdated,
+          [=](const QVariantMap& values)
+          {
+            if (values.contains("clientID"))
+              updateClientId();
+          });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +86,8 @@ void HelperLauncher::gotMessage(const QVariantMap& message)
 {
   if (message.value("version").toString() != Version::GetVersionString())
   {
-    QLOG_WARN() << "Running helper does not match our current version. Killing it and starting a new one.";
+    QLOG_WARN()
+    << "Running helper does not match our current version. Killing it and starting a new one.";
     killHelper();
   }
   else
@@ -99,8 +101,7 @@ void HelperLauncher::socketError(QLocalSocket::LocalSocketError error)
 {
   QLOG_DEBUG() << "Failed to connect to helper:" << m_jsonClient->errorString();
 
-  if (error == QLocalSocket::ConnectionRefusedError ||
-      error == QLocalSocket::ServerNotFoundError)
+  if (error == QLocalSocket::ConnectionRefusedError || error == QLocalSocket::ServerNotFoundError)
     launch();
 }
 
@@ -124,7 +125,8 @@ void HelperLauncher::updateClientId()
     msg.insert("command", "info");
 
     QVariantMap arg;
-    arg.insert("clientId", SettingsComponent::Get().value(SETTINGS_SECTION_WEBCLIENT, "clientID").toString());
+    arg.insert("clientId",
+               SettingsComponent::Get().value(SETTINGS_SECTION_WEBCLIENT, "clientID").toString());
 
     QString userId = Utils::CurrentUserId();
     if (!userId.isEmpty())
@@ -178,7 +180,8 @@ QString HelperLauncher::HelperPath()
   programName += ".exe";
 #endif
 
-  QString helperPath = SettingsComponent::Get().value(SETTINGS_SECTION_PATH, "helperprogram").toString();
+  QString helperPath =
+  SettingsComponent::Get().value(SETTINGS_SECTION_PATH, "helperprogram").toString();
 
   // fallback to the resource dir
   if (helperPath.isEmpty() || !QFile().exists(helperPath))
@@ -193,7 +196,8 @@ QString HelperLauncher::HelperPath()
 /////////////////////////////////////////////////////////////////////////////////////////
 void HelperLauncher::stop()
 {
-  // this method needs to disconnect all signals from the helper as well, so it doesn't start up again.
+  // this method needs to disconnect all signals from the helper as well, so it doesn't start up
+  // again.
   m_jsonClient->disconnect();
   killHelper();
 }

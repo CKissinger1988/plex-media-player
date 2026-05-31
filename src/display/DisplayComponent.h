@@ -1,8 +1,8 @@
 #ifndef DISPLAYCOMPONENT_H
 #define DISPLAYCOMPONENT_H
 
-#include "DisplayManager.h"
 #include "ComponentManager.h"
+#include "DisplayManager.h"
 #include <QScreen>
 #include <QTimer>
 
@@ -46,24 +46,23 @@ public:
   QString debugInformation();
 
 private:
-  explicit DisplayComponent(QObject *parent = nullptr);
+  explicit DisplayComponent(QObject* parent = nullptr);
   QString displayName(int display);
   QString modePretty(int display, int mode);
 
-  DisplayManager  *m_displayManager;
+  DisplayManager* m_displayManager;
   int m_lastVideoMode;
   int m_lastDisplay;
   QTimer m_initTimer;
   QWindow* m_applicationWindow;
 
 public Q_SLOTS:
-  void  monitorChange();
-  bool  initializeDisplayManager();
-  bool  restorePreviousVideoMode();
+  void monitorChange();
+  bool initializeDisplayManager();
+  bool restorePreviousVideoMode();
 
 Q_SIGNALS:
   void refreshRateChanged();
-
 };
 
 #endif // DISPLAYCOMPONENT_H

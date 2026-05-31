@@ -4,14 +4,15 @@
 #include <private/qguiapplication_p.h>
 #include <qpa/qplatformintegration.h>
 
-#include "QsLog.h"
 #include "DisplayManagerRPI.h"
+#include "QsLog.h"
 #include "display/DisplayComponent.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void DisplayManagerRPI::tv_callback(void *callback_data, uint32_t reason, uint32_t param1, uint32_t param2)
+void DisplayManagerRPI::tv_callback(void* callback_data, uint32_t reason, uint32_t param1,
+                                    uint32_t param2)
 {
-  DisplayManagerRPI* obj = (DisplayManagerRPI *)callback_data;
+  DisplayManagerRPI* obj = (DisplayManagerRPI*)callback_data;
 
   emit obj->onTvChange(reason);
 }
@@ -19,17 +20,16 @@ void DisplayManagerRPI::tv_callback(void *callback_data, uint32_t reason, uint32
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 DisplayManagerRPI::DisplayManagerRPI(QObject* parent) : DisplayManager(parent)
 {
-  connect(this, &DisplayManagerRPI::onTvChange,
-          this, &DisplayManagerRPI::handleTvChange,
+  connect(this, &DisplayManagerRPI::onTvChange, this, &DisplayManagerRPI::handleTvChange,
           Qt::QueuedConnection);
 
-  vc_tv_register_callback(&tv_callback, (void *)this);
+  vc_tv_register_callback(&tv_callback, (void*)this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 DisplayManagerRPI::~DisplayManagerRPI()
 {
-  vc_tv_unregister_callback_full(&tv_callback, (void *)this);
+  vc_tv_unregister_callback_full(&tv_callback, (void*)this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,8 @@ static void get_modes(std::vector<TV_SUPPORTED_MODE_NEW_T>& modes, HDMI_RES_GROU
 
   HDMI_RES_GROUP_T preferred_group;
   uint32_t preferred_mode;
-  int got = vc_tv_hdmi_get_supported_modes_new(group, &modes[count], max_modes, &preferred_group, &preferred_mode);
+  int got = vc_tv_hdmi_get_supported_modes_new(group, &modes[count], max_modes, &preferred_group,
+                                               &preferred_mode);
   modes.resize(count + got);
 }
 
@@ -125,7 +126,8 @@ bool DisplayManagerRPI::setDisplayMode(int display, int mode)
   vc_tv_hdmi_set_property(&property);
 
   TV_SUPPORTED_MODE_NEW_T* tvmode = &m_modes[mode / 2];
-  bool ret = vc_tv_hdmi_power_on_explicit_new(HDMI_MODE_HDMI, (HDMI_RES_GROUP_T)tvmode->group, tvmode->code) == 0;
+  bool ret = vc_tv_hdmi_power_on_explicit_new(HDMI_MODE_HDMI, (HDMI_RES_GROUP_T)tvmode->group,
+                                              tvmode->code) == 0;
   if (!ret)
   {
     QLOG_ERROR() << "Failed to switch display mode" << ret;
@@ -147,10 +149,8 @@ int DisplayManagerRPI::getCurrentDisplayMode(int display)
   for (int mode = 0; mode < m_displays[display]->m_videoModes.size(); mode++)
   {
     TV_SUPPORTED_MODE_NEW_T* tvmode = &m_modes[mode];
-    if (tvmode->width == tvstate.width &&
-        tvmode->height == tvstate.height &&
-        tvmode->frame_rate == tvstate.frame_rate &&
-        tvmode->scan_mode == tvstate.scan_mode)
+    if (tvmode->width == tvstate.width && tvmode->height == tvstate.height &&
+        tvmode->frame_rate == tvstate.frame_rate && tvmode->scan_mode == tvstate.scan_mode)
     {
       bool ntsc = false;
       HDMI_PROPERTY_PARAM_T property;
@@ -169,8 +169,8 @@ int DisplayManagerRPI::getCurrentDisplayMode(int display)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void DisplayManagerRPI::resetRendering()
 {
-  QGuiApplication *guiApp = (QGuiApplication*)QGuiApplication::instance();
-  QQuickWindow *window = (QQuickWindow*)guiApp->focusWindow();
+  QGuiApplication* guiApp = (QGuiApplication*)QGuiApplication::instance();
+  QQuickWindow* window = (QQuickWindow*)guiApp->focusWindow();
   if (window)
   {
     QLOG_INFO() << "Recreating Qt UI renderer";
@@ -182,8 +182,9 @@ void DisplayManagerRPI::resetRendering()
 
     // Grab the Platform integration private object and recreate it
     // this allows to clean / recreate the dispmanx objects
-    QGuiApplicationPrivate *privateApp = (QGuiApplicationPrivate *)QGuiApplicationPrivate::get(guiApp);
-    QPlatformIntegration *integration = privateApp->platformIntegration();
+    QGuiApplicationPrivate* privateApp =
+    (QGuiApplicationPrivate*)QGuiApplicationPrivate::get(guiApp);
+    QPlatformIntegration* integration = privateApp->platformIntegration();
 
     if (integration)
     {

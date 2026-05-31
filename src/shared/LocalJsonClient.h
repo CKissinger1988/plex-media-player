@@ -23,4 +23,4 @@ private:
   QString m_serverPath;
 };
 
-#endif //KONVERGO_LOCALJSONCLIENT_H
+#endif // KONVERGO_LOCALJSONCLIENT_H

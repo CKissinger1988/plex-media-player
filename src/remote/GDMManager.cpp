@@ -1,33 +1,26 @@
 #include "GDMManager.h"
 
-#include <QUdpSocket>
 #include <QHostInfo>
+#include <QUdpSocket>
 
-#include "settings/SettingsComponent.h"
 #include "QsLog.h"
 #include "RemoteComponent.h"
+#include "settings/SettingsComponent.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-GDMManager::GDMManager(QObject *parent) : QObject(parent), m_port(-1)
-{
-}
+GDMManager::GDMManager(QObject* parent) : QObject(parent), m_port(-1) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void GDMManager::startAnnouncing()
-{
-  startListener();
-}
+void GDMManager::startAnnouncing() { startListener(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void GDMManager::stopAnnouncing()
-{
-  m_socket.close();
-}
+void GDMManager::stopAnnouncing() { m_socket.close(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void GDMManager::startListener()
 {
-  m_socket.bind(QHostAddress::AnyIPv4, 32412, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
+  m_socket.bind(QHostAddress::AnyIPv4, 32412,
+                QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
 
   QHostAddress multicast("239.0.0.250");
   m_socket.joinMulticastGroup(multicast);
@@ -69,11 +62,11 @@ QByteArray GDMManager::getPacket()
 
   QVariantMap headers = RemoteComponent::GDMInformation();
 
-  for(const QString& key : headers.keys())
+  for (const QString& key : headers.keys())
     packetData.append(key + ": " + headers[key].toString() + "\r\n");
 
   // terminate header
   packetData.append("\r\n");
-  
+
   return packetData;
 }

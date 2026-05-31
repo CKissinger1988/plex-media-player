@@ -1,17 +1,17 @@
 #include "Utils.h"
-#include <QtGlobal>
-#include <QStandardPaths>
 #include <QCoreApplication>
-#include <QDir>
-#include <QProcess>
 #include <QDateTime>
+#include <QDir>
+#include <QFile>
 #include <QHostInfo>
 #include <QJsonDocument>
-#include <QVariant>
-#include <qnetworkinterface.h>
-#include <QUuid>
-#include <QFile>
+#include <QProcess>
 #include <QSaveFile>
+#include <QStandardPaths>
+#include <QUuid>
+#include <QVariant>
+#include <QtGlobal>
+#include <qnetworkinterface.h>
 
 #include <mutex>
 
@@ -20,7 +20,8 @@
 
 #include "QsLog.h"
 
-QList<QChar> httpSeparators = { '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', ']', '?', '=', '{', '}', '\'' };
+QList<QChar> httpSeparators = { '(',  ')', '<', '>', '@', ',', ';', ':', '\\',
+                                '\"', '/', '[', ']', '?', '=', '{', '}', '\'' };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 QString Utils::sanitizeForHttpSeparators(const QString& input)
@@ -30,7 +31,7 @@ QString Utils::sanitizeForHttpSeparators(const QString& input)
   for (const QChar& c : httpSeparators)
     output.replace(c, "");
 
-  for (int i = 0; i < output.size(); i ++)
+  for (int i = 0; i < output.size(); i++)
   {
     if (output.at(i).unicode() > 127)
       output[i] = '_';
@@ -43,13 +44,15 @@ QString Utils::ComputerName()
 {
   static std::once_flag flag;
   static QString name;
-  std::call_once(flag, [](){
+  std::call_once(flag,
+                 []()
+                 {
 #ifdef Q_OS_MAC
-    name = OSXUtils::ComputerName();
+                   name = OSXUtils::ComputerName();
 #else
     name = QHostInfo::localHostName();
 #endif
-  });
+                 });
   return name;
 }
 
@@ -62,7 +65,7 @@ QJsonDocument Utils::OpenJsonDocument(const QString& path, QJsonParseError* err)
 
   if (fp.open(QFile::ReadOnly))
   {
-    while(true)
+    while (true)
     {
       QByteArray row = fp.readLine();
 
@@ -88,11 +91,11 @@ Platform Utils::CurrentPlatform()
 #if defined(Q_OS_MAC)
   return PLATFORM_OSX;
 #elif KONVERGO_OPENELEC
-  #if TARGET_RPI
-    return PLATFORM_OE_RPI;
-  #else
-    return PLATFORM_OE_X86;
-  #endif
+#if TARGET_RPI
+  return PLATFORM_OE_RPI;
+#else
+  return PLATFORM_OE_X86;
+#endif
 #elif defined(Q_OS_LINUX)
   return PLATFORM_LINUX;
 #elif defined(Q_OS_WIN32)
@@ -127,14 +130,15 @@ QString Utils::CurrentUserId()
 QString Utils::PrimaryIPv4Address()
 {
   QList<QNetworkInterface> ifs = QNetworkInterface::allInterfaces();
-  for(const QNetworkInterface& iface : ifs)
+  for (const QNetworkInterface& iface : ifs)
   {
     if (iface.isValid() && iface.flags() & QNetworkInterface::IsUp)
     {
       QList<QHostAddress> addresses = iface.allAddresses();
-      for(const QHostAddress& addr : addresses)
+      for (const QHostAddress& addr : addresses)
       {
-        if (!addr.isLoopback() && !addr.isMulticast() && addr.protocol() == QAbstractSocket::IPv4Protocol)
+        if (!addr.isLoopback() && !addr.isMulticast() &&
+            addr.protocol() == QAbstractSocket::IPv4Protocol)
           return addr.toString();
       }
     }
@@ -145,7 +149,8 @@ QString Utils::PrimaryIPv4Address()
 /////////////////////////////////////////////////////////////////////////////////////////
 QString Utils::ClientUUID()
 {
-  QString storedUUID = SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "clientUUID").toString();
+  QString storedUUID =
+  SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "clientUUID").toString();
   if (storedUUID.isEmpty())
   {
     QString newUUID = QUuid::createUuid().toString();

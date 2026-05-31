@@ -5,8 +5,8 @@
 #ifndef PLEXMEDIAPLAYER_EVENTFILTER_H
 #define PLEXMEDIAPLAYER_EVENTFILTER_H
 
-#include <QObject>
 #include <QEvent>
+#include <QObject>
 
 class EventFilter : public QObject
 {
@@ -21,4 +21,4 @@ private:
   bool m_currentKeyDown;
 };
 
-#endif //PLEXMEDIAPLAYER_EVENTFILTER_H
+#endif // PLEXMEDIAPLAYER_EVENTFILTER_H

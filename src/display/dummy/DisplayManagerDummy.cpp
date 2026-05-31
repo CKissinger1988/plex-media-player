@@ -1,5 +1,5 @@
-#include "QsLog.h"
 #include "DisplayManagerDummy.h"
+#include "QsLog.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void DisplayManagerDummy::addMode(float rate)
@@ -41,7 +41,8 @@ bool DisplayManagerDummy::setDisplayMode(int display, int mode)
   DMDisplayPtr displayptr = m_displays[display];
   DMVideoModePtr videomode = displayptr->m_videoModes[mode];
 
-  QLOG_INFO() << "Switching to" << videomode->m_width << "x" << videomode->m_height << "@" << videomode->m_refreshRate;
+  QLOG_INFO() << "Switching to" << videomode->m_width << "x" << videomode->m_height << "@"
+              << videomode->m_refreshRate;
 
   m_currentMode = videomode->m_id;
 
@@ -58,10 +59,7 @@ int DisplayManagerDummy::getCurrentDisplayMode(int display)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-int DisplayManagerDummy::getMainDisplay()
-{
-  return 0;
-}
+int DisplayManagerDummy::getMainDisplay() { return 0; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int DisplayManagerDummy::getDisplayFromPoint(int x, int y)

@@ -2,21 +2,20 @@
 #define PLAYERCOMPONENT_H
 
 #include <QObject>
-#include <QtCore/qglobal.h>
-#include <QVariant>
-#include <QSet>
 #include <QQuickWindow>
-#include <QTimer>
+#include <QSet>
 #include <QTextStream>
+#include <QTimer>
+#include <QVariant>
+#include <QtCore/qglobal.h>
 
 #include <functional>
 
-#include "ComponentManager.h"
 #include "CodecsComponent.h"
+#include "ComponentManager.h"
 #include "QtHelper.h"
 
 #include <mpv/client.h>
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class PlayerComponent : public ComponentBase
@@ -29,19 +28,23 @@ public:
   bool componentExport() override { return true; }
   bool componentInitialize() override;
   void componentPostInitialize() override;
-  
+
   explicit PlayerComponent(QObject* parent = nullptr);
   ~PlayerComponent() override;
 
   // Deprecated. Corresponds to stop() + queueMedia().
-  Q_INVOKABLE bool load(const QString& url, const QVariantMap& options, const QVariantMap& metadata, const QString& audioStream = QString(), const QString& subtitleStream = QString());
+  Q_INVOKABLE bool load(const QString& url, const QVariantMap& options, const QVariantMap& metadata,
+                        const QString& audioStream = QString(),
+                        const QString& subtitleStream = QString());
 
   // Append a media item to the internal playlist. If nothing is played yet, the
   // newly appended item will start playing immediately.
   // options:
   //  - startMilliseconds: start playback at this time (in ms)
   //  - autoplay: if false, start playback paused; if true, start normally
-  Q_INVOKABLE void queueMedia(const QString& url, const QVariantMap& options, const QVariantMap &metadata, const QString& audioStream, const QString& subtitleStream);
+  Q_INVOKABLE void queueMedia(const QString& url, const QVariantMap& options,
+                              const QVariantMap& metadata, const QString& audioStream,
+                              const QString& subtitleStream);
 
   // This clears all items queued with queueMedia().
   // It explicitly excludes the currently playing item. The main use of this function
@@ -60,7 +63,7 @@ public:
 
   Q_INVOKABLE virtual void pause();
   Q_INVOKABLE virtual void play();
-  
+
   // 0-100 volume 0=mute and 100=normal
   // Ignored if no audio output active (e.g. when no file is playing).
   Q_INVOKABLE virtual void setVolume(int volume);
@@ -81,7 +84,7 @@ public:
   Q_INVOKABLE virtual QVariant getAudioDeviceList();
   // Uses the "name" from the device list.
   Q_INVOKABLE virtual void setAudioDevice(const QString& name);
-  
+
   Q_INVOKABLE virtual void setAudioStream(const QString& audioStream);
   Q_INVOKABLE virtual void setSubtitleStream(const QString& subtitleStream);
 
@@ -128,7 +131,8 @@ public:
   static QStringList AudioCodecsAll() { return { "ac3", "dts", "eac3", "dts-hd", "truehd" }; };
   static QStringList AudioCodecsSPDIF() { return { "ac3", "dts" }; };
 
-  enum class State {
+  enum class State
+  {
     finished,
     canceled,
     error,
@@ -137,11 +141,12 @@ public:
     buffering,
   };
 
-  enum class MediaType {
+  enum class MediaType
+  {
     Subtitle,
     Audio,
   };
-  
+
 public Q_SLOTS:
   void setAudioConfiguration();
   void updateAudioDeviceList();
@@ -164,7 +169,7 @@ Q_SIGNALS:
   void canceled();                // playback was stopped (by user/via API)
   void error(const QString& msg); // playback stopped due to external error
   // To be phased out. Raised on finished() and canceled().
-  void stopped();                 // playback finished successfully, or was stopped with stop()
+  void stopped(); // playback finished successfully, or was stopped with stop()
   void stateChanged(State newState, State oldState); // all state changes
 
   // true if the video (or music) is actually playing
@@ -181,7 +186,7 @@ Q_SIGNALS:
   void onVideoRecangleChanged();
 
   void onMpvEvents();
-  
+
 private:
   // this is the function actually implemented in the backends. the variantmap contains
   // a few known keys:
@@ -194,7 +199,7 @@ private:
   void loadWithOptions(const QVariantMap& options);
   void setQtQuickWindow(QQuickWindow* window);
   void updatePlaybackState();
-  void handleMpvEvent(mpv_event *event);
+  void handleMpvEvent(mpv_event* event);
   // Potentially switch the display refresh rate, and return true if the refresh rate
   // was actually changed.
   bool switchDisplayFrameRate();
@@ -208,8 +213,8 @@ private:
   // Call resume() when done.
   void startCodecsLoading(std::function<void()> resume);
   void updateVideoAspectSettings();
-  QVariantList findStreamsForURL(const QString &url);
-  void reselectStream(const QString &streamSelection, MediaType target);
+  QVariantList findStreamsForURL(const QString& url);
+  void reselectStream(const QString& streamSelection, MediaType target);
 
   mpv::qt::Handle m_mpv;
 

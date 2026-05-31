@@ -1,18 +1,18 @@
 #include "InputMapping.h"
+#include <QByteArray>
 #include <QDir>
 #include <QDirIterator>
-#include <QByteArray>
 #include <QFile>
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonObject>
 
-#include "QsLog.h"
 #include "Paths.h"
+#include "QsLog.h"
 #include "utils/Utils.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-InputMapping::InputMapping(QObject *parent) : QObject(parent), m_sourceMatcher(false)
+InputMapping::InputMapping(QObject* parent) : QObject(parent), m_sourceMatcher(false)
 {
   m_watcher = new QFileSystemWatcher(this);
   connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &InputMapping::dirChange);
@@ -68,7 +68,7 @@ QVariantList InputMapping::mapToAction(const QString& source, const QString& key
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool InputMapping::loadMappingFile(const QString& path, QPair<QString, QVariantMap> &mappingPair)
+bool InputMapping::loadMappingFile(const QString& path, QPair<QString, QVariantMap>& mappingPair)
 {
   QJsonParseError err;
   auto doc = Utils::OpenJsonDocument(path, &err);
@@ -129,10 +129,10 @@ bool InputMapping::loadMappingDirectory(const QString& path, bool copy)
           QFile::remove(examplePath);
 
         QFile::copy(finfo.absoluteFilePath(), examplePath);
-        QFile(examplePath).setPermissions(QFileDevice::ReadOwner | QFileDevice::ReadGroup | QFileDevice::WriteOwner |
-                                            QFileDevice::WriteGroup | QFileDevice::ReadOther);
+        QFile(examplePath)
+        .setPermissions(QFileDevice::ReadOwner | QFileDevice::ReadGroup | QFileDevice::WriteOwner |
+                        QFileDevice::WriteGroup | QFileDevice::ReadOther);
       }
-
 
       QPair<QString, QVariantMap> mapping;
       if (loadMappingFile(finfo.absoluteFilePath(), mapping))
@@ -143,7 +143,7 @@ bool InputMapping::loadMappingDirectory(const QString& path, bool copy)
           // get the input map and add it to a new CachedMatcher
           QVariantMap inputMap = mapping.second.value("mapping").toMap();
           auto inputMatcher = new CachedRegexMatcher(true, this);
-          for(const QString& pattern : inputMap.keys())
+          for (const QString& pattern : inputMap.keys())
             inputMatcher->addMatcher("^" + pattern + "$", inputMap.value(pattern));
 
           m_inputMatcher.insert(mapping.first, inputMatcher);

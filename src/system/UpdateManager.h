@@ -9,16 +9,16 @@ class UpdateManager : public QObject
 public:
   static bool CheckForUpdates();
 
-  explicit UpdateManager(QObject *parent = nullptr) {};
+  explicit UpdateManager(QObject* parent = nullptr) {};
   ~UpdateManager() override {};
 
   static UpdateManager* Get();
 
   virtual QString HaveUpdate();
-  virtual bool applyUpdate(const QString &version);
+  virtual bool applyUpdate(const QString& version);
   virtual void doUpdate(const QString& version);
 
-  static QString GetPath(const QString &file, const QString& version, bool package);
+  static QString GetPath(const QString& file, const QString& version, bool package);
 };
 
 #endif // UPDATEMANAGER_H

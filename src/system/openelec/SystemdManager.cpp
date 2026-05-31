@@ -7,57 +7,56 @@
 #define TEMPLATE_DIR "/usr/share/services/"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool SystemdManager::isEnabled(SystemdService &Service)
+bool SystemdManager::isEnabled(SystemdService& Service)
 {
-    return QFile::exists(CACHE_DIR + Service.ConfigFile + ".conf");
+  return QFile::exists(CACHE_DIR + Service.ConfigFile + ".conf");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool SystemdManager::enable(SystemdService &Service, bool enable)
+bool SystemdManager::enable(SystemdService& Service, bool enable)
 {
-    QFile onFile(CACHE_DIR + Service.ConfigFile + ".conf");
-    QFile offFile(CACHE_DIR + Service.ConfigFile + ".disabled");
-    QFile templateFile(TEMPLATE_DIR + Service.ConfigFile + ".conf");
+  QFile onFile(CACHE_DIR + Service.ConfigFile + ".conf");
+  QFile offFile(CACHE_DIR + Service.ConfigFile + ".disabled");
+  QFile templateFile(TEMPLATE_DIR + Service.ConfigFile + ".conf");
 
-    QLOG_INFO() << "Setting service" << Service.Name << "to enable state :" << enable;
+  QLOG_INFO() << "Setting service" << Service.Name << "to enable state :" << enable;
 
-    if (!onFile.exists() && !offFile.exists())
+  if (!onFile.exists() && !offFile.exists())
+  {
+    // we take the template file and copy it over
+    if (!templateFile.copy(enable ? onFile.fileName() : offFile.fileName()))
     {
-        // we take the template file and copy it over
-        if(!templateFile.copy(enable ? onFile.fileName() : offFile.fileName()))
-        {
-            QLOG_ERROR() << "Failed to copy template file for service " << Service.Name;
-            return false;
-        }
+      QLOG_ERROR() << "Failed to copy template file for service " << Service.Name;
+      return false;
     }
+  }
 
-    bool rename = false;
-    if (onFile.exists() && !enable)
+  bool rename = false;
+  if (onFile.exists() && !enable)
+  {
+    rename = onFile.rename(offFile.fileName());
+  }
+
+  if (offFile.exists() && enable)
+  {
+    rename = offFile.rename(onFile.fileName());
+  }
+
+  if (rename)
+  {
+    QProcess p;
+    p.start("systemctl", QStringList() << "restart" << Service.Name);
+
+    if (p.waitForFinished(1000))
     {
-       rename = onFile.rename(offFile.fileName());
+      return true;
     }
-
-    if (offFile.exists() && enable)
+    else
     {
-       rename = offFile.rename(onFile.fileName());
+      QLOG_ERROR() << "Failed to restart service " << Service.Name;
+      return false;
     }
+  }
 
-    if (rename)
-    {
-        QProcess p;
-        p.start("systemctl", QStringList() << "restart" << Service.Name);
-
-        if (p.waitForFinished(1000))
-        {
-            return true;
-        }
-        else
-        {
-            QLOG_ERROR() << "Failed to restart service " << Service.Name;
-            return false;
-        }
-    }
-
-    return false;
+  return false;
 }
-

@@ -1,32 +1,32 @@
 #include "CodecsComponent.h"
-#include <QString>
-#include <Qt>
+#include <QCoreApplication>
+#include <QCryptographicHash>
 #include <QDir>
 #include <QDomAttr>
 #include <QDomDocument>
 #include <QDomNode>
-#include <QCoreApplication>
 #include <QProcess>
-#include <QUuid>
-#include <QUrl>
-#include <QUrlQuery>
 #include <QResource>
 #include <QSaveFile>
 #include <QStandardPaths>
+#include <QString>
 #include <QSysInfo>
-#include <QCryptographicHash>
 #include <QTemporaryDir>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QUuid>
+#include <Qt>
 
 #ifdef HAVE_MINIZIP
-#include <minizip/unzip.h>
 #include <minizip/ioapi.h>
+#include <minizip/unzip.h>
 #endif
 
-#include "system/SystemComponent.h"
-#include "settings/SettingsComponent.h"
-#include "utils/Utils.h"
-#include "shared/Paths.h"
 #include "PlayerComponent.h"
+#include "settings/SettingsComponent.h"
+#include "shared/Paths.h"
+#include "system/SystemComponent.h"
+#include "utils/Utils.h"
 
 #include "QsLog.h"
 
@@ -40,16 +40,22 @@ Q_DECLARE_METATYPE(CodecDriver);
 #include "CodecManifest.h"
 #else
 #define WITH_CODECS 0
-#define CODEC_VERSION   "dummy"
-#define SHLIB_PREFIX    ""
+#define CODEC_VERSION "dummy"
+#define SHLIB_PREFIX ""
 #define SHLIB_EXTENSION "dummy"
 // Codec.name is the name of the codec implementation, Codec.codecName the name of the codec
-struct Codec {const char* name; const char* codecName; const char* profiles; int external;};
+struct Codec
+{
+  const char* name;
+  const char* codecName;
+  const char* profiles;
+  int external;
+};
 static const Codec Decoders[] = {
-    {"dummy", "dummy", nullptr, 1},
+  { "dummy", "dummy", nullptr, 1 },
 };
 static const Codec Encoders[] = {
-    {"dummy", "dummy", nullptr, 1},
+  { "dummy", "dummy", nullptr, 1 },
 };
 #endif
 
@@ -80,8 +86,7 @@ static QSet<QString> g_systemAudioDecoderWhitelist = {
   "eac3_mf",
 };
 
-static QSet<QString> g_systemAudioEncoderWhitelist = {
-};
+static QSet<QString> g_systemAudioEncoderWhitelist = {};
 
 static QSize g_mediaFoundationH264MaxResolution;
 
@@ -112,11 +117,11 @@ static QString getEAEBuildType()
 #if defined(Q_OS_MAC)
   return "darwin-x86_64";
 #elif defined(Q_OS_WIN)
-  return sizeof(void *) > 4 ? "windows-x86_64" : "windows-i386";
+  return sizeof(void*) > 4 ? "windows-x86_64" : "windows-i386";
 #elif defined(TARGET_RPI)
   return "linux-raspi2-arm7";
 #elif defined(Q_OS_LINUX)
-  return sizeof(void *) > 4 ? "linux-ubuntu-x86_64" : "linux-ubuntu-i686";
+  return sizeof(void*) > 4 ? "linux-ubuntu-x86_64" : "linux-ubuntu-i686";
 #else
   return "unknown";
 #endif
@@ -139,10 +144,7 @@ QString Codecs::plexNameFromFF(QString ffname)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static QString codecsRootPath()
-{
-  return Paths::dataDir("Codecs") + QDir::separator();
-}
+static QString codecsRootPath() { return Paths::dataDir("Codecs") + QDir::separator(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static QString codecsPath()
@@ -160,7 +162,7 @@ static QString eaePrefixPath()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static QString eaeBinaryPath()
 {
-QString exeSuffix = "";
+  QString exeSuffix = "";
 #ifdef Q_OS_WIN
   exeSuffix = ".exe";
 #endif
@@ -168,10 +170,7 @@ QString exeSuffix = "";
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static bool eaeIsPresent()
-{
-  return QFile(eaeBinaryPath()).exists();
-}
+static bool eaeIsPresent() { return QFile(eaeBinaryPath()).exists(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static int indexOfCodecInList(const QList<CodecDriver>& list, const CodecDriver& codec)
@@ -189,7 +188,7 @@ void Codecs::updateCachedCodecList()
 {
   g_cachedCodecList.clear();
 
-  for (CodecType type : {CodecType::Decoder, CodecType::Encoder})
+  for (CodecType type : { CodecType::Decoder, CodecType::Encoder })
   {
     const Codec* list = (type == CodecType::Decoder) ? Decoders : Encoders;
     size_t count = (type == CodecType::Decoder) ? countof(Decoders) : countof(Encoders);
@@ -224,13 +223,11 @@ void Codecs::updateCachedCodecList()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const QList<CodecDriver>& Codecs::getCachedCodecList()
-{
-  return g_cachedCodecList;
-}
+const QList<CodecDriver>& Codecs::getCachedCodecList() { return g_cachedCodecList; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-QList<CodecDriver> Codecs::findCodecsByFormat(const QList<CodecDriver>& list, CodecType type, const QString& format)
+QList<CodecDriver> Codecs::findCodecsByFormat(const QList<CodecDriver>& list, CodecType type,
+                                              const QString& format)
 {
   QList<CodecDriver> result;
   for (const CodecDriver& codec : list)
@@ -254,10 +251,7 @@ QString CodecDriver::getFileName() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-QString CodecDriver::getPath() const
-{
-  return QDir(codecsPath()).absoluteFilePath(getFileName());
-}
+QString CodecDriver::getPath() const { return QDir(codecsPath()).absoluteFilePath(getFileName()); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CodecDriver::isSystemCodec() const
@@ -308,10 +302,7 @@ bool CodecDriver::isWhitelistedSystemVideoCodec() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static bool useSystemAudioDecoders()
-{
-  return true;
-}
+static bool useSystemAudioDecoders() { return true; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static bool useSystemVideoDecoders()
@@ -342,10 +333,14 @@ static QString findOldDeviceID()
     QDir::home().path() + "/Library/Application Support/Plex Media Server/Codecs/.device-id",
     QDir::home().path() + "/Library/Application Support/Plex/Plex Media Server/Codecs/.device-id",
 #endif
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex/Codecs/.device-id",
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex/codecs/.device-id",
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex Media Server/Codecs/.device-id",
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex/Plex Media Server/Codecs/.device-id",
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    "/Plex/Codecs/.device-id",
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    "/Plex/codecs/.device-id",
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    "/Plex Media Server/Codecs/.device-id",
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    "/Plex/Plex Media Server/Codecs/.device-id",
     Paths::dataDir() + "/codecs/.device-id",
   };
 
@@ -428,7 +423,7 @@ void Codecs::preinitCodecs()
   // This must be run before any threads are started etc. (for safety).
   setEnv("FFMPEG_EXTERNAL_LIBS", escapedPath);
 
-  QTemporaryDir d(QDir::tempPath() + "/pmp-eae-XXXXXX");
+  QTemporaryDir d(QDir::tempPath() + "/sam-eae-XXXXXX");
   d.setAutoRemove(false);
   g_eaeWatchFolder = d.path();
 
@@ -524,7 +519,8 @@ static void updateCodecs()
 #endif
     QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex/Codecs/",
     QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex/codecs/",
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Plex Media Server/Codecs/",
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    "/Plex Media Server/Codecs/",
     Paths::dataDir() + "/codecs/",
   };
 
@@ -558,7 +554,7 @@ static void updateCodecs()
   {
     if ((codecFiles.contains(codec.getFileName()) && codec.external && !codec.present) ||
         (codec.getSystemCodecType() == "eae" && needEAE))
-        install.append(codec);
+      install.append(codec);
   }
 
   if (!install.empty())
@@ -569,11 +565,12 @@ static void updateCodecs()
     QLOG_INFO() << "Updating some codecs: " + codecs.join(", ");
 
     auto fetcher = new CodecsFetcher();
-    QObject::connect(fetcher, &CodecsFetcher::done, [](CodecsFetcher* sender)
-    {
-      QLOG_INFO() << "Codec update finished.";
-      sender->deleteLater();
-    });
+    QObject::connect(fetcher, &CodecsFetcher::done,
+                     [](CodecsFetcher* sender)
+                     {
+                       QLOG_INFO() << "Codec update finished.";
+                       sender->deleteLater();
+                     });
     fetcher->startCodecs = false;
     fetcher->installCodecs(install);
   }
@@ -685,9 +682,10 @@ static Downloader::HeaderList getPlexHeaders()
   Downloader::HeaderList headers;
   QString auth = SystemComponent::Get().authenticationToken();
   if (auth.size())
-    headers.append(Downloader::Header{"X-Plex-Token", auth});
-  headers.append(Downloader::Header{"X-Plex-Product", WITH_CODECS ? "Plex Media Player" : "openpmp"});
-  headers.append(Downloader::Header{"X-Plex-Platform", "Konvergo"});
+    headers.append(Downloader::Header{ "X-Plex-Token", auth });
+  headers.append(
+  Downloader::Header{ "X-Plex-Product", WITH_CODECS ? "SpartanAI-Media" : "openpmp" });
+  headers.append(Downloader::Header{ "X-Plex-Platform", "Konvergo" });
   return headers;
 }
 
@@ -716,7 +714,7 @@ void CodecsFetcher::startNext()
 
     QUrl url = buildCodecQuery(STRINGIFY(EAE_VERSION), "easyaudioencoder", getEAEBuildType());
 
-    Downloader *downloader = new Downloader(QVariant("eae"), url, getPlexHeaders(), this);
+    Downloader* downloader = new Downloader(QVariant("eae"), url, getPlexHeaders(), this);
     connect(downloader, &Downloader::done, this, &CodecsFetcher::codecInfoDownloadDone);
     return;
   }
@@ -735,7 +733,7 @@ void CodecsFetcher::startNext()
 
   QUrl url = buildCodecQuery(g_codecVersion, codec.getMangledName(), getBuildType());
 
-  Downloader *downloader = new Downloader(QVariant::fromValue(codec), url, getPlexHeaders(), this);
+  Downloader* downloader = new Downloader(QVariant::fromValue(codec), url, getPlexHeaders(), this);
   connect(downloader, &Downloader::done, this, &CodecsFetcher::codecInfoDownloadDone);
 }
 
@@ -775,12 +773,13 @@ bool CodecsFetcher::processCodecInfoReply(const QVariant& context, const QByteAr
   QString hash = attrs.namedItem("fileSha").toAttr().value();
   m_currentHash = QByteArray::fromHex(hash.toUtf8());
   // it's hardcoded to SHA-1
-  if (!m_currentHash.size()) {
+  if (!m_currentHash.size())
+  {
     QLOG_ERROR() << "Hash value in unexpected format or missing:" << hash;
     return false;
   }
 
-  Downloader *downloader = new Downloader(context, url, getPlexHeaders(), this);
+  Downloader* downloader = new Downloader(context, url, getPlexHeaders(), this);
   connect(downloader, &Downloader::done, this, &CodecsFetcher::codecDownloadDone);
 
   return true;
@@ -809,28 +808,16 @@ static voidpf unz_open_file(voidpf opaque, const char* filename, int mode)
 
 static uLong unz_read_file(voidpf opaque, voidpf stream, void* buf, uLong size)
 {
-  return fread(buf, 1, size, (FILE *)stream);
+  return fread(buf, 1, size, (FILE*)stream);
 }
 
-static uLong unz_write_file(voidpf opaque, voidpf stream, const void* buf, uLong size)
-{
-  return 0;
-}
+static uLong unz_write_file(voidpf opaque, voidpf stream, const void* buf, uLong size) { return 0; }
 
-static int unz_close_file(voidpf opaque, voidpf stream)
-{
-  return fclose((FILE *)stream);
-}
+static int unz_close_file(voidpf opaque, voidpf stream) { return fclose((FILE*)stream); }
 
-static int unz_error_file(voidpf opaque, voidpf stream)
-{
-  return ferror((FILE *)stream);
-}
+static int unz_error_file(voidpf opaque, voidpf stream) { return ferror((FILE*)stream); }
 
-static long unz_tell_file(voidpf opaque, voidpf stream)
-{
-  return ftell((FILE *)stream);
-}
+static long unz_tell_file(voidpf opaque, voidpf stream) { return ftell((FILE*)stream); }
 
 long unz_seek_file(voidpf opaque, voidpf stream, uLong offset, int origin)
 {
@@ -847,7 +834,7 @@ long unz_seek_file(voidpf opaque, voidpf stream, uLong offset, int origin)
       whence = SEEK_SET;
       break;
   }
-  return fseek((FILE *)stream, offset, whence);
+  return fseek((FILE*)stream, offset, whence);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -896,7 +883,8 @@ static bool extractZip(QString zip, QString dest)
     char filename[256];
     unz_file_info finfo;
 
-    if ((unzerr = unzGetCurrentFileInfo(file, &finfo, filename, sizeof(filename), 0, 0, 0, 0)) != UNZ_OK)
+    if ((unzerr = unzGetCurrentFileInfo(file, &finfo, filename, sizeof(filename), 0, 0, 0, 0)) !=
+        UNZ_OK)
     {
       QLOG_ERROR() << "unzGetCurrentFileInfo() failed with" << unzerr;
       goto fail;
@@ -908,7 +896,7 @@ static bool extractZip(QString zip, QString dest)
       goto fail;
     }
 
-    char *pathpart = strrchr(filename, '/');
+    char* pathpart = strrchr(filename, '/');
     if (pathpart)
     {
       //  This part sucks especially: temporarily cut off the string.
@@ -987,10 +975,7 @@ fail:
 #else /* ifdef HAVE_MINIZIP */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static bool extractZip(QString zip, QString dest)
-{
-  return false;
-}
+static bool extractZip(QString zip, QString dest) { return false; }
 
 #endif
 
@@ -1071,7 +1056,6 @@ void CodecsFetcher::codecDownloadDone(QVariant userData, bool success, const QBy
   startNext();
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CodecsFetcher::startEAE()
 {
@@ -1080,30 +1064,21 @@ void CodecsFetcher::startEAE()
     g_eaeProcess = new QProcess();
     g_eaeProcess->setProcessChannelMode(QProcess::ForwardedChannels);
     connect(g_eaeProcess, &QProcess::stateChanged,
-      [](QProcess::ProcessState s)
-      {
-        QLOG_INFO() << "EAE process state:" << s;
-      }
-    );
+            [](QProcess::ProcessState s) { QLOG_INFO() << "EAE process state:" << s; });
     connect(g_eaeProcess, &QProcess::errorOccurred,
-      [](QProcess::ProcessError e)
-      {
-        QLOG_INFO() << "EAE process error:" << e;
-      }
-    );
-    connect(g_eaeProcess, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-      [](int exitCode, QProcess::ExitStatus exitStatus)
-      {
-        QLOG_INFO() << "EAE process finished:" << exitCode << exitStatus;
-      }
-    );
+            [](QProcess::ProcessError e) { QLOG_INFO() << "EAE process error:" << e; });
+    connect(g_eaeProcess,
+            static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+            [](int exitCode, QProcess::ExitStatus exitStatus)
+            { QLOG_INFO() << "EAE process finished:" << exitCode << exitStatus; });
   }
 
   if (g_eaeProcess->state() == QProcess::NotRunning)
   {
     if (g_eaeProcess->program().size())
     {
-      int exitCode = g_eaeProcess->exitStatus() == QProcess::NormalExit ? g_eaeProcess->exitCode() : -1;
+      int exitCode =
+      g_eaeProcess->exitStatus() == QProcess::NormalExit ? g_eaeProcess->exitCode() : -1;
       QLOG_ERROR() << "EAE died with exit code" << exitCode;
     }
 
@@ -1116,8 +1091,7 @@ void CodecsFetcher::startEAE()
     dir.removeRecursively();
     dir.mkpath(".");
 
-    static const QStringList watchfolder_names =
-    {
+    static const QStringList watchfolder_names = {
       "Convert to WAV (to 2ch or less)",
       "Convert to WAV (to 8ch or less)",
       "Convert to Dolby Digital (Low Quality - 384 kbps)",
@@ -1138,7 +1112,8 @@ void CodecsFetcher::startEAE()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-Downloader::Downloader(QVariant userData, const QUrl& url, const HeaderList& headers, QObject* parent)
+Downloader::Downloader(QVariant userData, const QUrl& url, const HeaderList& headers,
+                       QObject* parent)
   : QObject(parent), m_userData(userData), m_lastProgress(-1)
 {
   QLOG_INFO() << "HTTP request:" << url.toDisplayString();
@@ -1149,7 +1124,7 @@ Downloader::Downloader(QVariant userData, const QUrl& url, const HeaderList& hea
   QNetworkRequest request(url);
   for (int n = 0; n < headers.size(); n++)
     request.setRawHeader(headers[n].first.toUtf8(), headers[n].second.toUtf8());
-  QNetworkReply *reply = m_WebCtrl.get(request);
+  QNetworkReply* reply = m_WebCtrl.get(request);
   if (reply)
   {
     connect(reply, &QNetworkReply::downloadProgress, this, &Downloader::downloadProgress);
@@ -1165,7 +1140,8 @@ void Downloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
     if (m_lastProgress < 0 || progress > m_lastProgress + 10)
     {
       m_lastProgress = progress;
-      QLOG_INFO() << "HTTP request at" << progress << "% (" << bytesReceived << "/" << bytesTotal << ")";
+      QLOG_INFO() << "HTTP request at" << progress << "% (" << bytesReceived << "/" << bytesTotal
+                  << ")";
     }
   }
 }
@@ -1192,7 +1168,8 @@ void Downloader::networkFinished(QNetworkReply* pReply)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static CodecDriver selectBestDecoder(const StreamInfo& stream)
 {
-  QList<CodecDriver> codecs = Codecs::findCodecsByFormat(Codecs::getCachedCodecList(), CodecType::Decoder, stream.codec);
+  QList<CodecDriver> codecs =
+  Codecs::findCodecsByFormat(Codecs::getCachedCodecList(), CodecType::Decoder, stream.codec);
   CodecDriver best = {};
   int bestScore = -1;
   for (auto codec : codecs)
@@ -1209,7 +1186,8 @@ static CodecDriver selectBestDecoder(const StreamInfo& stream)
       if (codec.format == "h264")
       {
         // Avoid using system video decoders for h264 profiles usually not supported.
-        if (stream.profile != "" && stream.profile != "main" && stream.profile != "baseline" && stream.profile != "high")
+        if (stream.profile != "" && stream.profile != "main" && stream.profile != "baseline" &&
+            stream.profile != "high")
           score = 1;
       }
       if (codec.driver == "h264_mf")
@@ -1228,7 +1206,8 @@ static CodecDriver selectBestDecoder(const StreamInfo& stream)
         if (stream.audioChannels > 6)
           score = 1;
         // Another arbitrary limit.
-        if (stream.audioSampleRate > 0 && (stream.audioSampleRate < 8000 || stream.audioSampleRate > 48000))
+        if (stream.audioSampleRate > 0 &&
+            (stream.audioSampleRate < 8000 || stream.audioSampleRate > 48000))
           score = 1;
       }
       if (codec.getSystemCodecType() == "eae")
@@ -1302,7 +1281,8 @@ QList<CodecDriver> Codecs::determineRequiredCodecs(const PlaybackInfo& info)
 
   if (needAC3Encoder)
   {
-    QList<CodecDriver> codecs = Codecs::findCodecsByFormat(Codecs::getCachedCodecList(), CodecType::Encoder, "ac3");
+    QList<CodecDriver> codecs =
+    Codecs::findCodecsByFormat(Codecs::getCachedCodecList(), CodecType::Encoder, "ac3");
     CodecDriver encoder = {};
     for (auto codec : codecs)
     {

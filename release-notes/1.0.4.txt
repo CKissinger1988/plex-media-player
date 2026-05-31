@@ -10,7 +10,7 @@ NEW:
 
 FIXES:
   - mpv's internal OSD is now switched off, we are replacing this with something
-    native to PMP in an upcoming version.
+    native to SAM in an upcoming version.
   - Fixed refresh rate switching on RPI2
   - Correctly signal NTSC (23.976hz) refresh rates on RPI2
   - Fixed refresh rate switching bugs on Windows (Thanks niko34!)

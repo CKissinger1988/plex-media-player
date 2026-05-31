@@ -3,7 +3,7 @@
 NEW:
 
 - Desktop web-client updated to 3.29.7
-- Resolve plex.direct domains internally. Enabled playback from secure servers when PMP is not connected to the Internet.
+- Resolve plex.direct domains internally. Enabled playback from secure servers when SAM is not connected to the Internet.
 - Initial support for Bluetooth and Touch Bar controls on macOS.
 - Enable refreshrate.avoid_25hz_30hz by default.
 - UI: Entirely new video, music, and photo player user interfaces!
@@ -22,7 +22,7 @@ NEW:
 
 FIXED:
 
-- Ignore OS notifications when files are dropped onto the PMP window during drag and drop actions.
+- Ignore OS notifications when files are dropped onto the SAM window during drag and drop actions.
 - Work around Windows' media-key handling which sends multiple input notifications for Play/Pause and Next key presses.
 - Speculative fix for user reported trouble pressing Up and Down on silver Apple IR remotes when using a Mac Mini running High Sierra.
 - Avoid corruption issues when GL context sharing between Qt and WebEngine fails. 5K macs (the previous corruption issue) still work, thanks to our Qt patches.
@@ -42,5 +42,5 @@ FIXED:
 - UI: Page background does not change when browsing photo albums.
 - UI: Fixed the background of the items in the user switcher screen so they're no longer tiled.
 - UI: Fixed tracks count on Album Preplay pages.
-- UI: Fixed volume resetting when PMP is restarted and volume was muted.
+- UI: Fixed volume resetting when SAM is restarted and volume was muted.
 - UI: Fixed preplay/library item details getting stuck in a loading state after switching users.

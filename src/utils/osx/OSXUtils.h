@@ -1,8 +1,8 @@
 #ifndef OSXUTILS_H
 #define OSXUTILS_H
 
-#include <QString>
 #include <ApplicationServices/ApplicationServices.h>
+#include <QString>
 
 namespace OSXUtils
 {
@@ -10,6 +10,6 @@ namespace OSXUtils
   OSStatus SendAppleEventToSystemProcess(AEEventID eventToSendID);
 
   void SetCursorVisible(bool visible);
-};
+}; // namespace OSXUtils
 
 #endif /* OSXUTILS_H */

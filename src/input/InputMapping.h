@@ -1,12 +1,12 @@
 #ifndef INPUTMAPPING_H
 #define INPUTMAPPING_H
 
-#include <QMap>
-#include <QObject>
 #include <QFileSystemWatcher>
+#include <QMap>
+#include <QMutex>
+#include <QObject>
 #include <QRegExp>
 #include <QVariantMap>
-#include <QMutex>
 #include <utils/CachedRegexMatcher.h>
 
 class InputMapping : public QObject
@@ -14,7 +14,7 @@ class InputMapping : public QObject
   Q_OBJECT
 
 public:
-  explicit InputMapping(QObject *parent = nullptr);
+  explicit InputMapping(QObject* parent = nullptr);
   bool loadMappings();
   QVariantList mapToAction(const QString& source, const QString& keycode);
 
@@ -25,7 +25,7 @@ signals:
   void mappingChanged();
 
 private:
-  bool loadMappingFile(const QString &path, QPair<QString, QVariantMap> &mappingPair);
+  bool loadMappingFile(const QString& path, QPair<QString, QVariantMap>& mappingPair);
   bool loadMappingDirectory(const QString& path, bool copy);
 
   QFileSystemWatcher* m_watcher;

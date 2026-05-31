@@ -4,30 +4,28 @@
 
 #include "RemoteComponent.h"
 
-#include <QXmlStreamWriter>
 #include <QUrlQuery>
+#include <QXmlStreamWriter>
 
 #include "QsLog.h"
+#include "Version.h"
 #include "settings/SettingsComponent.h"
 #include "utils/Utils.h"
-#include "Version.h"
 
-static QMap<QString, QString> g_resourceKeyMap = {
-  { "Name", "title" },
-  { "Resource-Identifier", "machineIdentifier" },
-  { "Product", "product" },
-  { "Version", "version" },
-  { "Protocol-Version", "protocolVersion" },
-  { "Protocol-Capabilities", "protocolCapabilities" },
-  { "Device-Class", "deviceClass" }
-};
+static QMap<QString, QString> g_resourceKeyMap = { { "Name", "title" },
+                                                   { "Resource-Identifier", "machineIdentifier" },
+                                                   { "Product", "product" },
+                                                   { "Version", "version" },
+                                                   { "Protocol-Version", "protocolVersion" },
+                                                   { "Protocol-Capabilities",
+                                                     "protocolCapabilities" },
+                                                   { "Device-Class", "deviceClass" } };
 
-static QMap<QString, QString> g_headerKeyMap = {
-  { "Name", "X-Plex-Device-Name" },
-  { "Resource-Identifier", "X-Plex-Client-Identifier" },
-  { "Product", "X-Plex-Product" },
-  { "Version", "X-Plex-Version" }
-};
+static QMap<QString, QString> g_headerKeyMap = { { "Name", "X-Plex-Device-Name" },
+                                                 { "Resource-Identifier",
+                                                   "X-Plex-Client-Identifier" },
+                                                 { "Product", "X-Plex-Product" },
+                                                 { "Version", "X-Plex-Version" } };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 RemoteComponent::RemoteComponent(QObject* parent) : ComponentBase(parent), m_commandId(0)
@@ -47,7 +45,8 @@ bool RemoteComponent::componentInitialize()
   m_subscriberTimer.start();
 
   // connect the network access stuff
-  connect(m_networkAccessManager, &QNetworkAccessManager::finished, this, &RemoteComponent::timelineFinished);
+  connect(m_networkAccessManager, &QNetworkAccessManager::finished, this,
+          &RemoteComponent::timelineFinished);
 
   return true;
 }
@@ -58,7 +57,7 @@ QVariantMap RemoteComponent::HeaderInformation()
   QVariantMap gdmInfo = GDMInformation();
   QVariantMap headerInfo;
 
-  for(const QString& key : gdmInfo.keys())
+  for (const QString& key : gdmInfo.keys())
   {
     if (g_headerKeyMap.contains(key))
       headerInfo[g_headerKeyMap[key]] = gdmInfo[key];
@@ -66,7 +65,7 @@ QVariantMap RemoteComponent::HeaderInformation()
 
   headerInfo["X-Plex-Platform"] = QSysInfo::productType();
   headerInfo["X-Plex-Platform-Version"] = QSysInfo::productVersion();
-  
+
   return headerInfo;
 }
 
@@ -76,7 +75,7 @@ QVariantMap RemoteComponent::ResourceInformation()
   QVariantMap gdmInfo = GDMInformation();
   QVariantMap resourceInfo;
 
-  for(const QString& key : gdmInfo.keys())
+  for (const QString& key : gdmInfo.keys())
   {
     if (g_resourceKeyMap.contains(key))
       resourceInfo[g_resourceKeyMap[key]] = gdmInfo[key];
@@ -86,7 +85,7 @@ QVariantMap RemoteComponent::ResourceInformation()
   resourceInfo["platformVersion"] = QSysInfo::productVersion();
 
   // Vary the `title` value depending on the `systemname` value in
-  // plexmediaplayer.conf. The `title` is used by the UI when publishing PMP as
+  // plexmediaplayer.conf. The `title` is used by the UI when publishing SAM as
   // a Plex Companion player.
   //
   // The `gdmInfo` contains a `title` value which is equivalent to the system's
@@ -103,9 +102,10 @@ QVariantMap RemoteComponent::ResourceInformation()
   // pathological case of an empty `systemname`.
   //
   // See: resources/settings/settings_description.json
-  // See: https://github.com/plexinc/plex-media-player/issues/762
-  QString systemname = SettingsComponent::Get().value(SETTINGS_SECTION_SYSTEM, "systemname").toString();
-  QString defaultSystemname = "PlexMediaPlayer";
+  // See: https://github.com/plexinc/spartanai-media/issues/762
+  QString systemname =
+  SettingsComponent::Get().value(SETTINGS_SECTION_SYSTEM, "systemname").toString();
+  QString defaultSystemname = "SpartanAIMedia";
 
   bool isSystemnameEmpty = systemname.isEmpty();
   bool isSystemnameDefault = systemname.compare(defaultSystemname) == 0;
@@ -116,7 +116,8 @@ QVariantMap RemoteComponent::ResourceInformation()
   QLOG_DEBUG() << "Resolving system name: Host name:" << gdmInfo["Name"].toString();
   QLOG_DEBUG() << "Resolving system name: System name setting:" << systemname;
   QLOG_DEBUG() << "Resolving system name: Is system name setting empty value:" << isSystemnameEmpty;
-  QLOG_DEBUG() << "Resolving system name: Is system name setting default value:" << isSystemnameDefault;
+  QLOG_DEBUG() << "Resolving system name: Is system name setting default value:"
+               << isSystemnameDefault;
   QLOG_DEBUG() << "Resolving system name: Final value:" << resourceInfo["title"].toString();
 
   return resourceInfo;
@@ -126,16 +127,17 @@ QVariantMap RemoteComponent::ResourceInformation()
 QVariantMap RemoteComponent::GDMInformation()
 {
   QVariantMap headers = {
-    {"Name", Utils::sanitizeForHttpSeparators(Utils::ComputerName())},
-    {"RawName", Utils::ComputerName()},
-    {"Port", SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "webserverport")},
-    {"Version", Version::GetVersionString()},
-    {"Product", "Plex Media Player"},
-    {"Protocol", "plex"},
-    {"Protocol-Version", "1"},
-    {"Protocol-Capabilities", "navigation,playback,timeline,mirror,playqueues"},
-    {"Device-Class", "pc"},
-    {"Resource-Identifier", SettingsComponent::Get().value(SETTINGS_SECTION_WEBCLIENT, "clientID")}
+    { "Name", Utils::sanitizeForHttpSeparators(Utils::ComputerName()) },
+    { "RawName", Utils::ComputerName() },
+    { "Port", SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "webserverport") },
+    { "Version", Version::GetVersionString() },
+    { "Product", "SpartanAI-Media" },
+    { "Protocol", "plex" },
+    { "Protocol-Version", "1" },
+    { "Protocol-Capabilities", "navigation,playback,timeline,mirror,playqueues" },
+    { "Device-Class", "pc" },
+    { "Resource-Identifier",
+      SettingsComponent::Get().value(SETTINGS_SECTION_WEBCLIENT, "clientID") }
   };
 
   return headers;
@@ -155,7 +157,7 @@ void RemoteComponent::handleResource(QHttpRequest* request, QHttpResponse* respo
     output.writeStartElement("MediaContainer");
     output.writeStartElement("Player");
 
-    for(const QString& key : headers.keys())
+    for (const QString& key : headers.keys())
       output.writeAttribute(key, headers[key].toString());
 
     output.writeEndElement();
@@ -178,7 +180,7 @@ QVariantMap RemoteComponent::QueryToMap(const QUrl& url)
   QUrlQuery query(url);
   QVariantMap queryMap;
 
-  for(auto stringPair : query.queryItems())
+  for (auto stringPair : query.queryItems())
   {
     QString key = stringPair.first;
     QString value = QUrl::fromPercentEncoding(stringPair.second.toLatin1()).toUtf8();
@@ -200,17 +202,17 @@ QVariantMap RemoteComponent::QueryToMap(const QUrl& url)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-QVariantMap RemoteComponent::HeaderToMap(const qhttp::THeaderHash& hash, const QUrl *url)
+QVariantMap RemoteComponent::HeaderToMap(const qhttp::THeaderHash& hash, const QUrl* url)
 {
   QVariantMap variantMap;
-  for(const QString& key : hash.keys())
+  for (const QString& key : hash.keys())
     variantMap.insert(key.toLower(), hash.value(key.toUtf8()));
 
   // add any eventual X-Plex- param that could be in query parameters
   if (url)
   {
     QVariantMap paramsMap = QueryToMap(*url);
-    for(const QString &key : paramsMap.keys())
+    for (const QString& key : paramsMap.keys())
     {
       QString paramKey = key.toLower();
       if ((paramKey.startsWith("x-plex-")) && (!variantMap.contains(paramKey)))
@@ -230,11 +232,14 @@ void RemoteComponent::handleCommand(QHttpRequest* request, QHttpResponse* respon
   QString identifier = headerMap["x-plex-client-identifier"].toString();
 
   response->addHeader("Access-Control-Allow-Origin", "*");
-  response->addHeader("X-Plex-Client-Identifier",  SettingsComponent::Get().value(SETTINGS_SECTION_WEBCLIENT, "clientID").toByteArray());
+  response->addHeader(
+  "X-Plex-Client-Identifier",
+  SettingsComponent::Get().value(SETTINGS_SECTION_WEBCLIENT, "clientID").toByteArray());
 
   // handle CORS requests here
-  if ((request->method() == qhttp::EHTTP_OPTIONS) && headerMap.contains("access-control-request-method"))
-  {    
+  if ((request->method() == qhttp::EHTTP_OPTIONS) &&
+      headerMap.contains("access-control-request-method"))
+  {
     response->addHeader("Content-Type", "text/plain");
     response->addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, HEAD");
     response->addHeader("Access-Control-Max-Age", "1209600");
@@ -242,7 +247,8 @@ void RemoteComponent::handleCommand(QHttpRequest* request, QHttpResponse* respon
 
     if (headerMap.contains("access-control-request-headers"))
     {
-      response->addHeader("Access-Control-Allow-Headers", headerMap.value("access-control-request-headers").toByteArray());
+      response->addHeader("Access-Control-Allow-Headers",
+                          headerMap.value("access-control-request-headers").toByteArray());
     }
 
     response->setStatusCode(qhttp::ESTATUS_OK);
@@ -278,7 +284,8 @@ void RemoteComponent::handleCommand(QHttpRequest* request, QHttpResponse* respon
     if (!m_subscriberMap.contains(identifier))
       return;
 
-    RemotePollSubscriber *subscriber = dynamic_cast<RemotePollSubscriber *>(m_subscriberMap[identifier]);
+    RemotePollSubscriber* subscriber =
+    dynamic_cast<RemotePollSubscriber*>(m_subscriberMap[identifier]);
     if (subscriber)
     {
       subscriber->reSubscribe();
@@ -286,7 +293,7 @@ void RemoteComponent::handleCommand(QHttpRequest* request, QHttpResponse* respon
 
       // if we don't have to wait, just ship the update right away
       // otherwise, this will wait until next update
-      if (! (queryMap.contains("wait") && (queryMap["wait"].toList()[0].toInt() == 1)))
+      if (!(queryMap.contains("wait") && (queryMap["wait"].toList()[0].toInt() == 1)))
       {
         subscriber->sendUpdate();
       }
@@ -294,7 +301,6 @@ void RemoteComponent::handleCommand(QHttpRequest* request, QHttpResponse* respon
 
     return;
   }
-
 
   // handle commandID
   if (!headerMap.contains("x-plex-client-identifier") || !queryMap.contains("commandID"))
@@ -328,13 +334,11 @@ void RemoteComponent::handleCommand(QHttpRequest* request, QHttpResponse* respon
     subscriber->setCommandId(m_commandId, queryMap["commandID"].toList()[0].toInt());
   }
 
-  QVariantMap arg = {
-    { "method", request->methodString() },
-    { "headers", headerMap },
-    { "path", request->url().path() },
-    { "query", queryMap },
-    { "commandID", m_commandId}
-  };
+  QVariantMap arg = { { "method", request->methodString() },
+                      { "headers", headerMap },
+                      { "path", request->url().path() },
+                      { "query", queryMap },
+                      { "commandID", m_commandId } };
 
   emit commandReceived(arg);
 }
@@ -349,7 +353,7 @@ void RemoteComponent::responseDone()
 
     bool found = false;
     quint64 foundId = 0;
-    for(auto responseId : m_responseMap.keys())
+    for (auto responseId : m_responseMap.keys())
     {
       if (m_responseMap[responseId] == response)
       {
@@ -368,8 +372,7 @@ void RemoteComponent::responseDone()
 void RemoteComponent::commandResponse(const QVariantMap& responseArguments)
 {
   // check for minimum requirements in the responseArguments
-  if (!responseArguments.contains("commandID") ||
-      !responseArguments.contains("responseCode"))
+  if (!responseArguments.contains("commandID") || !responseArguments.contains("responseCode"))
   {
     QLOG_WARN() << "responseArguments did not contain a commandId or responseCode";
     return;
@@ -381,7 +384,8 @@ void RemoteComponent::commandResponse(const QVariantMap& responseArguments)
   QMutexLocker lk(&m_responseLock);
   if (!m_responseMap.contains(commandId))
   {
-    QLOG_WARN() << "Could not find responseId:" << commandId << " - maybe it was removed because of a timeout?";
+    QLOG_WARN() << "Could not find responseId:" << commandId
+                << " - maybe it was removed because of a timeout?";
     return;
   }
 
@@ -394,8 +398,8 @@ void RemoteComponent::commandResponse(const QVariantMap& responseArguments)
   if (responseArguments.contains("headers") && responseArguments["headers"].type() == QVariant::Map)
   {
     QVariantMap headers = responseArguments["headers"].toMap();
-      for(const QString& key : headers.keys())
-        response->addHeader(key.toUtf8(), headers[key].toByteArray());
+    for (const QString& key : headers.keys())
+      response->addHeader(key.toUtf8(), headers[key].toByteArray());
   }
 
   // write the response HTTP code
@@ -414,8 +418,7 @@ void RemoteComponent::handleSubscription(QHttpRequest* request, QHttpResponse* r
   QVariantMap headers = HeaderToMap(request->headers(), &request->url());
 
   // check for required headers
-  if (!headers.contains("x-plex-client-identifier") ||
-      (!headers.contains("x-plex-device-name")))
+  if (!headers.contains("x-plex-client-identifier") || (!headers.contains("x-plex-device-name")))
   {
     QLOG_ERROR() << "Missing X-Plex headers in /timeline/subscribe request";
     response->setStatusCode(qhttp::ESTATUS_BAD_REQUEST);
@@ -449,21 +452,26 @@ void RemoteComponent::handleSubscription(QHttpRequest* request, QHttpResponse* r
   {
     if (poll)
     {
-      QLOG_DEBUG() << "New poll subscriber:" << clientIdentifier << request->headers()["x-plex-device-name"];
-      subscriber = new RemotePollSubscriber(clientIdentifier, request->headers()["x-plex-device-name"], response, this);
+      QLOG_DEBUG() << "New poll subscriber:" << clientIdentifier
+                   << request->headers()["x-plex-device-name"];
+      subscriber = new RemotePollSubscriber(
+      clientIdentifier, request->headers()["x-plex-device-name"], response, this);
     }
     else
     {
       QUrl address;
-      QString protocol = query.contains("protocol") ? query["protocol"].toList()[0].toString() : "http";
+      QString protocol =
+      query.contains("protocol") ? query["protocol"].toList()[0].toString() : "http";
       int port = query.contains("port") ? query["port"].toList()[0].toInt() : 32400;
 
       address.setScheme(protocol);
       address.setHost(request->remoteAddress());
       address.setPort(port);
 
-      QLOG_DEBUG() << "New subscriber:" << clientIdentifier << request->headers()["x-plex-device-name"] << address.toString();
-      subscriber = new RemoteSubscriber(clientIdentifier, request->headers()["x-plex-device-name"], address, this);
+      QLOG_DEBUG() << "New subscriber:" << clientIdentifier
+                   << request->headers()["x-plex-device-name"] << address.toString();
+      subscriber = new RemoteSubscriber(clientIdentifier, request->headers()["x-plex-device-name"],
+                                        address, this);
     }
 
     m_subscriberMap[clientIdentifier] = subscriber;
@@ -490,11 +498,10 @@ void RemoteComponent::handleSubscription(QHttpRequest* request, QHttpResponse* r
 /////////////////////////////////////////////////////////////////////////////////////////
 void RemoteComponent::subscribeToWeb(bool subscribe)
 {
-  QVariantMap arg = {
-    { "method", "GET" },
-    { "path",  "/player/timeline/" +  (subscribe ? QLatin1String("subscribe") : QLatin1String("unsubscribe")) },
-    { "commandID", m_commandId}
-  };
+  QVariantMap arg = { { "method", "GET" },
+                      { "path", "/player/timeline/" + (subscribe ? QLatin1String("subscribe") :
+                                                                   QLatin1String("unsubscribe")) },
+                      { "commandID", m_commandId } };
 
   emit commandReceived(arg);
 }
@@ -504,19 +511,20 @@ void RemoteComponent::checkSubscribers()
 {
   QMutexLocker lk(&m_subscriberLock);
   QList<RemoteSubscriber*> subsToRemove;
-  for(RemoteSubscriber* subscriber : m_subscriberMap.values())
+  for (RemoteSubscriber* subscriber : m_subscriberMap.values())
   {
     // was it more than 10 seconds since this client checked in last?
     if (subscriber->lastSubscribe() > 90 * 1000)
     {
-      QLOG_DEBUG() << "more than 10 seconds since we heard from:" << subscriber->deviceName() << "- unsubscribing..";
+      QLOG_DEBUG() << "more than 10 seconds since we heard from:" << subscriber->deviceName()
+                   << "- unsubscribing..";
       subsToRemove << subscriber;
     }
   }
 
   lk.unlock();
 
-  for(RemoteSubscriber* sub : subsToRemove)
+  for (RemoteSubscriber* sub : subsToRemove)
     subscriberRemove(sub->clientIdentifier());
 }
 
@@ -526,7 +534,6 @@ QNetworkAccessManager* RemoteComponent::getNetworkAccessManager()
   // we might want to set common options here.
   return m_networkAccessManager;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void RemoteComponent::timelineFinished(QNetworkReply* reply)
@@ -578,7 +585,7 @@ void RemoteComponent::timelineUpdate(quint64 commandID, const QString& timeline)
 {
   QMutexLocker lk(&m_subscriberLock);
 
-  for(RemoteSubscriber* subscriber : m_subscriberMap.values())
+  for (RemoteSubscriber* subscriber : m_subscriberMap.values())
   {
     subscriber->queueTimeline(commandID, timeline.toUtf8());
     subscriber->sendUpdate();

@@ -27,4 +27,4 @@ private:
   QProcess* m_launchctl;
 };
 
-#endif //PLEXTHEATER_HELPERLAUNCHD_H
+#endif // PLEXTHEATER_HELPERLAUNCHD_H

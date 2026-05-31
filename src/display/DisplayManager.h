@@ -11,8 +11,8 @@
 
 #include <QMap>
 #include <QPoint>
-#include <QString>
 #include <QSharedPointer>
+#include <QString>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Video Modes
@@ -73,10 +73,10 @@ public:
 // Matching weights
 #define MATCH_WEIGHT_RES 1000
 
-#define MATCH_WEIGHT_REFRESH_RATE_EXACT               200
-#define MATCH_WEIGHT_REFRESH_RATE_MULTIPLE            75
-#define MATCH_WEIGHT_REFRESH_RATE_CLOSE               50
-#define MATCH_WEIGHT_REFRESH_RATE_MULTIPLE_CLOSE      25
+#define MATCH_WEIGHT_REFRESH_RATE_EXACT 200
+#define MATCH_WEIGHT_REFRESH_RATE_MULTIPLE 75
+#define MATCH_WEIGHT_REFRESH_RATE_CLOSE 50
+#define MATCH_WEIGHT_REFRESH_RATE_MULTIPLE_CLOSE 25
 
 #define MATCH_WEIGHT_INTERLACE 10
 
@@ -120,7 +120,7 @@ public:
   DMVideoModePtr getCurrentVideoMode(int display);
 
   int findBestMode(int display);
-  
+
   bool isValidDisplay(int display);
   bool isValidDisplayMode(int display, int mode);
   int getDisplayFromPoint(const QPoint& pt);

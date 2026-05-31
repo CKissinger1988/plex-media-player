@@ -3,22 +3,23 @@
 //
 
 #include "AudioSettingsController.h"
+#include "PlayerComponent.h"
 #include "SettingsComponent.h"
 #include "SettingsSection.h"
-#include "PlayerComponent.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 AudioSettingsController::AudioSettingsController(QObject* parent) : QObject(parent)
 {
   SettingsSection* audioSection = SettingsComponent::Get().getSection(SETTINGS_SECTION_AUDIO);
-  connect(audioSection, &SettingsSection::valuesUpdated, this, &AudioSettingsController::valuesUpdated);
+  connect(audioSection, &SettingsSection::valuesUpdated, this,
+          &AudioSettingsController::valuesUpdated);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void AudioSettingsController::setHiddenPassthrough(const QStringList& codecs, bool hidden)
 {
   SettingsSection* audioSection = SettingsComponent::Get().getSection(SETTINGS_SECTION_AUDIO);
-  for(const QString& codec : codecs)
+  for (const QString& codec : codecs)
     audioSection->setValueHidden("passthrough." + codec, hidden);
 }
 

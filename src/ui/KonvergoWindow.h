@@ -1,10 +1,9 @@
 #ifndef KONVERGOWINDOW_H
 #define KONVERGOWINDOW_H
 
-#include <QQuickWindow>
 #include <QEvent>
+#include <QQuickWindow>
 #include <settings/SettingsComponent.h>
-
 
 // This controls how big the web view will zoom using semantic zoom
 // over a specific number of pixels and we run out of space for on screen
@@ -12,7 +11,7 @@
 // we can use the GPU to transfer tiles directly but we set the limit on all platforms
 // to keep it consistent.
 //
-// See more discussion in: https://github.com/plexinc/plex-media-player/issues/10
+// See more discussion in: https://github.com/plexinc/spartanai-media/issues/10
 // The number of pixels here are REAL pixels, the code in webview.qml will compensate
 // for a higher DevicePixelRatio
 //
@@ -70,15 +69,9 @@ public:
 
   Q_SLOT void toggleWebMode();
 
-  Q_SLOT void toggleAlwaysOnTop()
-  {
-    setAlwaysOnTop(!isAlwaysOnTop());
-  }
+  Q_SLOT void toggleAlwaysOnTop() { setAlwaysOnTop(!isAlwaysOnTop()); }
 
-  Q_SLOT void reloadWeb()
-  {
-    emit reloadWebClient();
-  }
+  Q_SLOT void reloadWeb() { emit reloadWebClient(); }
 
   Q_INVOKABLE Q_SLOT void minimizeWindow()
   {
@@ -111,8 +104,8 @@ private slots:
   void updateDebugInfo();
   void playerWindowVisible(bool visible);
   void showUpdateDialog();
-  void onScreenAdded(QScreen *screen);
-  void onScreenRemoved(QScreen *screen);
+  void onScreenAdded(QScreen* screen);
+  void onScreenRemoved(QScreen* screen);
   void updateCurrentScreen();
 
 private:

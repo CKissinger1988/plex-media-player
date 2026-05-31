@@ -9,10 +9,7 @@
 #include <QDataStream>
 
 /////////////////////////////////////////////////////////////////////////////////////////
-bool InputSocket::initInput()
-{
-  return m_server->listen();
-}
+bool InputSocket::initInput() { return m_server->listen(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void InputSocket::clientConnected(QLocalSocket* socket)
@@ -35,8 +32,8 @@ void InputSocket::messageReceived(const QVariant& message)
     return;
   }
 
-  QLOG_DEBUG() << "Input from client:" << map.value("client").toString() << " - " <<
-               map.value("source").toString() << map.value("keycode").toString();
+  QLOG_DEBUG() << "Input from client:" << map.value("client").toString() << " - "
+               << map.value("source").toString() << map.value("keycode").toString();
 
   emit receivedInput(map.value("source").toString(), map.value("keycode").toString(), KeyPressed);
 }

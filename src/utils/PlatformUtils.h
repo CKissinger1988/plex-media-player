@@ -10,9 +10,8 @@
 class PlatformUtils
 {
 public:
-  PlatformUtils() { }
+  PlatformUtils() {}
   static bool isProcessAlive(Q_PID pid);
 };
 
-
-#endif //KONVERGO_PLATFORMUTILS_H
+#endif // KONVERGO_PLATFORMUTILS_H

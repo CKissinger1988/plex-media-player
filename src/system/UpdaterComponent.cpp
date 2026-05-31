@@ -2,35 +2,32 @@
 #include "QsLog.h"
 #include "utils/Utils.h"
 
-#include <QTimer>
-#include <QCoreApplication>
-#include <QStandardPaths>
-#include <QCryptographicHash>
-#include <QIODevice>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
-#include <QDir>
-#include <QFile>
-#include <QProcess>
-#include <QStringList>
-#include <utils/HelperLauncher.h>
-#include <QUrlQuery>
-#include <QDomDocument>
 #include "qhttpclient.hpp"
 #include "qhttpclientresponse.hpp"
+#include <QCoreApplication>
+#include <QCryptographicHash>
+#include <QDir>
+#include <QDomDocument>
+#include <QFile>
+#include <QIODevice>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QProcess>
+#include <QStandardPaths>
+#include <QStringList>
+#include <QTimer>
+#include <QUrlQuery>
+#include <utils/HelperLauncher.h>
 
-#include "settings/SettingsComponent.h"
-#include "UpdateManager.h"
 #include "SystemComponent.h"
+#include "UpdateManager.h"
+#include "settings/SettingsComponent.h"
 
 using namespace qhttp::client;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-UpdaterComponent::UpdaterComponent(QObject* parent) :
-  ComponentBase(parent),
-  m_netManager(this),
-  m_checkReply(nullptr),
-  m_enabled(true)
+UpdaterComponent::UpdaterComponent(QObject* parent)
+  : ComponentBase(parent), m_netManager(this), m_checkReply(nullptr), m_enabled(true)
 {
   m_file = nullptr;
   m_manifest = nullptr;
@@ -41,18 +38,22 @@ UpdaterComponent::UpdaterComponent(QObject* parent) :
 
   connect(&m_netManager, &QNetworkAccessManager::finished, this, &UpdaterComponent::dlComplete);
 
-  connect(&SystemComponent::Get(), &SystemComponent::userInfoChanged, [this](){
-    if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "automaticUpdates").toBool())
-      QTimer::singleShot(10 * 1000, this, &UpdaterComponent::checkForUpdate);
-  });
+  connect(&SystemComponent::Get(), &SystemComponent::userInfoChanged,
+          [this]()
+          {
+            if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "automaticUpdates").toBool())
+              QTimer::singleShot(10 * 1000, this, &UpdaterComponent::checkForUpdate);
+          });
 
   auto updateTimer = new QTimer(this);
-  connect(updateTimer, &QTimer::timeout, [&]{
-    auto diff = m_lastUpdateCheck.secsTo(QTime::currentTime());
-    QLOG_DEBUG() << "It has gone" << diff << "seconds since last update check.";
-    if (diff >= (3 * 60 * 60))
-      checkForUpdate();
-  });
+  connect(updateTimer, &QTimer::timeout,
+          [&]
+          {
+            auto diff = m_lastUpdateCheck.secsTo(QTime::currentTime());
+            QLOG_DEBUG() << "It has gone" << diff << "seconds since last update check.";
+            if (diff >= (3 * 60 * 60))
+              checkForUpdate();
+          });
 
   if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "automaticUpdates").toBool())
     updateTimer->start(5 * 60 * 1000);
@@ -65,7 +66,8 @@ void UpdaterComponent::checkForUpdate()
     return;
 
   auto systemInfo = SystemComponent::Get().systemInformation();
-  QUrl baseUrl = QString("https://plex.tv/updater/products/%0/check.xml").arg(systemInfo["productid"].toInt());
+  QUrl baseUrl =
+  QString("https://plex.tv/updater/products/%0/check.xml").arg(systemInfo["productid"].toInt());
   QUrlQuery query;
 
   query.addQueryItem("version", systemInfo["version"].toString());
@@ -73,7 +75,8 @@ void UpdaterComponent::checkForUpdate()
   // query.addQueryItem("version", "1.1.5.405-43e1569b");
   query.addQueryItem("build", systemInfo["build"].toString());
   query.addQueryItem("distribution", systemInfo["dist"].toString());
-  query.addQueryItem("channel", SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "updateChannel").toString());
+  query.addQueryItem(
+  "channel", SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "updateChannel").toString());
 
   auto authToken = SystemComponent::Get().authenticationToken();
   if (!authToken.isEmpty())
@@ -87,19 +90,18 @@ void UpdaterComponent::checkForUpdate()
     QNetworkRequest req(baseUrl);
     req.setPriority(QNetworkRequest::HighPriority);
     m_checkReply = m_netManager.get(req);
-    connect(m_checkReply, &QNetworkReply::readyRead, [this]()
-    {
-      m_checkData.append(m_checkReply->read(m_checkReply->bytesAvailable()));
-    });
-    connect(m_checkReply, &QNetworkReply::finished, [this]()
-    {
-      auto updateData = parseUpdateData(m_checkData);
-      if (!updateData.isEmpty())
-        startUpdateDownload(updateData);
+    connect(m_checkReply, &QNetworkReply::readyRead,
+            [this]() { m_checkData.append(m_checkReply->read(m_checkReply->bytesAvailable())); });
+    connect(m_checkReply, &QNetworkReply::finished,
+            [this]()
+            {
+              auto updateData = parseUpdateData(m_checkData);
+              if (!updateData.isEmpty())
+                startUpdateDownload(updateData);
 
-      m_checkData.clear();
-      m_checkReply = nullptr;
-    });
+              m_checkData.clear();
+              m_checkReply = nullptr;
+            });
   }
 
   m_lastUpdateCheck = QTime::currentTime();
@@ -155,9 +157,9 @@ void UpdaterComponent::downloadFile(Update* update)
   request.setAttribute(QNetworkRequest::BackgroundRequestAttribute, true);
   if (update->setReply(m_netManager.get(request)))
     QLOG_INFO() << "Downloading update:" << update->m_url << "to:" << update->m_localPath;
-  else QLOG_ERROR() << "Failed to start download:" << update->m_url;
+  else
+    QLOG_ERROR() << "Failed to start download:" << update->m_url;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool UpdaterComponent::fileComplete(Update* update)
@@ -203,8 +205,9 @@ void UpdaterComponent::startUpdateDownload(const QVariantHash& updateInfo)
     return;
   }
 
-  if (!updateInfo.contains("version") || !updateInfo.contains("manifestURL") || !updateInfo.contains("manifestHash") ||
-      !updateInfo.contains("fileURL") || !updateInfo.contains("fileHash") || !updateInfo.contains("fileName"))
+  if (!updateInfo.contains("version") || !updateInfo.contains("manifestURL") ||
+      !updateInfo.contains("manifestHash") || !updateInfo.contains("fileURL") ||
+      !updateInfo.contains("fileHash") || !updateInfo.contains("fileName"))
   {
     QLOG_ERROR() << "updateInfo was missing fields required to carry out this action.";
     return;
@@ -303,7 +306,6 @@ QVariantHash UpdaterComponent::parseUpdateData(const QByteArray& data)
     return updateInfo;
   }
 
-
   QVariantList releases;
 
   auto root = doc.documentElement();
@@ -374,5 +376,3 @@ QVariantHash UpdaterComponent::parseUpdateData(const QByteArray& data)
 
   return updateInfo;
 }
-
-

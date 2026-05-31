@@ -8,7 +8,7 @@ import QtQuick.Controls 1.4
 KonvergoWindow
 {
   id: mainWindow
-  title: "Plex Media Player"
+  title: "SpartanAI-Media"
   objectName: "mainWindow"
   minimumHeight: windowMinSize.height
   minimumWidth: windowMinSize.width

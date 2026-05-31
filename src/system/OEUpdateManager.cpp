@@ -1,20 +1,14 @@
-#include <QProcess>
-#include <QDir>
-#include "QsLog.h"
 #include "OEUpdateManager.h"
+#include "QsLog.h"
 #include "SystemComponent.h"
+#include <QDir>
+#include <QProcess>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-QString OEUpdateManager::HaveUpdate()
-{
-  return "";
-}
+QString OEUpdateManager::HaveUpdate() { return ""; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool OEUpdateManager::applyUpdate(const QString& version)
-{
-  return true;
-}
+bool OEUpdateManager::applyUpdate(const QString& version) { return true; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void OEUpdateManager::doUpdate(const QString& version)
@@ -23,20 +17,21 @@ void OEUpdateManager::doUpdate(const QString& version)
   QString packagePath = GetPath("", version, true);
   QDir packageDir(packagePath);
 
-  QStringList updateFiles = packageDir.entryList(QStringList( "*.tar"), QDir::Files, QDir::Time);
+  QStringList updateFiles = packageDir.entryList(QStringList("*.tar"), QDir::Files, QDir::Time);
 
   // make sure we remove all the eventually remaining downloads
   QDir rootDir(GetPath("", "", false));
 
-  foreach(auto updateDir, rootDir.entryList(QStringList("*"), QDir::Dirs | QDir::NoDotAndDotDot))
+  foreach (auto updateDir, rootDir.entryList(QStringList("*"), QDir::Dirs | QDir::NoDotAndDotDot))
   {
-      QDir checkDir(rootDir.absolutePath() + updateDir);
-      if (checkDir != QDir(GetPath("", version, false)))
+    QDir checkDir(rootDir.absolutePath() + updateDir);
+    if (checkDir != QDir(GetPath("", version, false)))
+    {
+      if (!checkDir.removeRecursively())
       {
-          if (!checkDir.removeRecursively()) {
-              QLOG_ERROR() << "Failed to remove directory" << checkDir.path();
-          }
+        QLOG_ERROR() << "Failed to remove directory" << checkDir.path();
       }
+    }
   }
 
   if (updateFiles.size())
@@ -55,8 +50,9 @@ void OEUpdateManager::doUpdate(const QString& version)
       {
         // remove the update package
         QDir updateDir(GetPath("", version, false));
-        if (!updateDir.removeRecursively()) {
-            QLOG_ERROR() << "Failed to remove directory" << updateDir.path();
+        if (!updateDir.removeRecursively())
+        {
+          QLOG_ERROR() << "Failed to remove directory" << updateDir.path();
         }
 
         // now reboot to do the update
@@ -80,7 +76,8 @@ bool OEUpdateManager::isMiniUpdateArchive(QString archivePath)
   }
   else
   {
-    QLOG_ERROR() << "Unable to list update archive files : " << QString(process.readAllStandardError());
+    QLOG_ERROR() << "Unable to list update archive files : "
+                 << QString(process.readAllStandardError());
   }
 
   return false;

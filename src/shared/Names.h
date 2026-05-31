@@ -11,6 +11,6 @@ namespace Names
 {
   QString MainName();
   QString HelperName();
-};
+}; // namespace Names
 
-#endif //NAMES_H
+#endif // NAMES_H

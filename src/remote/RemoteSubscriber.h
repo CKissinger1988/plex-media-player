@@ -5,13 +5,13 @@
 #ifndef KONVERGO_REMOTESUBSCRIBER_H
 #define KONVERGO_REMOTESUBSCRIBER_H
 
-#include <QObject>
-#include <QPointer>
-#include <QUrl>
 #include <QDateTime>
 #include <QDomDocument>
 #include <QNetworkReply>
+#include <QObject>
+#include <QPointer>
 #include <QQueue>
+#include <QUrl>
 
 #include "qhttpserverresponse.hpp"
 
@@ -19,7 +19,8 @@
 class RemoteSubscriber : public QObject
 {
 public:
-  RemoteSubscriber(const QString& clientIdentifier, const QString& deviceName, const QUrl& address, QObject* parent = nullptr);
+  RemoteSubscriber(const QString& clientIdentifier, const QString& deviceName, const QUrl& address,
+                   QObject* parent = nullptr);
   void reSubscribe();
   int lastSubscribe() const { return m_subscribeTime.elapsed(); }
 
@@ -67,22 +68,23 @@ protected:
 
 #if 0
   quint16 m_errors;
- #endif
+#endif
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 class RemotePollSubscriber : public RemoteSubscriber
 {
 public:
-  RemotePollSubscriber(const QString& clientIdentifier, const QString& deviceName, qhttp::server::QHttpResponse *response, QObject* parent = nullptr);
-  void setHTTPResponse(qhttp::server::QHttpResponse *response);
+  RemotePollSubscriber(const QString& clientIdentifier, const QString& deviceName,
+                       qhttp::server::QHttpResponse* response, QObject* parent = nullptr);
+  void setHTTPResponse(qhttp::server::QHttpResponse* response);
   void sendUpdate() override;
 
-private :
-   QPointer<qhttp::server::QHttpResponse> m_response;
+private:
+  QPointer<qhttp::server::QHttpResponse> m_response;
 
 public Q_SLOTS:
-   void responseDone();
+  void responseDone();
 };
 
-#endif //KONVERGO_REMOTESUBSCRIBER_H
+#endif // KONVERGO_REMOTESUBSCRIBER_H

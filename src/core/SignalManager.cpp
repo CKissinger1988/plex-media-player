@@ -1,6 +1,6 @@
+#include "signal.h"
 #include "sys/socket.h"
 #include "unistd.h"
-#include "signal.h"
 
 #include "QsLog.h"
 #include "SignalManager.h"

@@ -2,10 +2,10 @@
 #define __SYSTEM_COMPONENT_H__
 
 #include "ComponentManager.h"
-#include <QTimer>
-#include "utils/Utils.h"
-#include "Paths.h"
 #include "Names.h"
+#include "Paths.h"
+#include "utils/Utils.h"
+#include <QTimer>
 
 // System modifiers
 #define SYSTEM_MODIFIER_OPENELEC "OpenELEC"
@@ -110,7 +110,6 @@ private:
   QString m_webClientVersion;
   bool m_cursorVisible;
   qreal m_scale;
-
 };
 
 #endif

@@ -9,9 +9,9 @@
 #ifndef _INPUT_SDL_
 #define _INPUT_SDL_
 
-#include <QThread>
-#include <QElapsedTimer>
 #include <QByteArray>
+#include <QElapsedTimer>
+#include <QThread>
 #include <SDL.h>
 
 #include "input/InputComponent.h"
@@ -40,7 +40,8 @@ public slots:
   void close();
 
 signals:
-  void receivedInput(const QString& source, const QString& keycode, InputBase::InputkeyState keyState);
+  void receivedInput(const QString& source, const QString& keycode,
+                     InputBase::InputkeyState keyState);
 
 private:
   void refreshJoystickList();
@@ -60,15 +61,16 @@ class InputSDL : public InputBase
 public:
   explicit InputSDL(QObject* parent);
   ~InputSDL() override;
-  
+
   const char* inputName() override { return "SDL"; }
   bool initInput() override;
-  
+
   void close();
+
 private:
   InputSDLWorker* m_sdlworker;
   QThread* m_thread;
-  
+
 signals:
   void run();
 };

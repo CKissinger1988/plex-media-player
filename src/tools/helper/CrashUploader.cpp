@@ -5,19 +5,19 @@
 #include "CrashUploader.h"
 
 #include <QDir>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QHttpMultiPart>
-#include <QNetworkReply>
 #include <QEventLoop>
 #include <QFileInfo>
+#include <QHttpMultiPart>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QSysInfo>
 
+#include "HelperSettings.h"
 #include "Paths.h"
+#include "QsLog.h"
 #include "Version.h"
 #include "utils/Utils.h"
-#include "QsLog.h"
-#include "HelperSettings.h"
 
 #define UPLOAD_URL "https://crashreport.plexapp.com"
 
@@ -26,7 +26,7 @@
 void CrashUploader::deleteOldCrashDumps()
 {
   QDir dir(m_old);
-  for(const QString& entry : dir.entryList(QDir::Dirs | QDir::NoDot | QDir::NoDotDot))
+  for (const QString& entry : dir.entryList(QDir::Dirs | QDir::NoDot | QDir::NoDotDot))
   {
     if (entry != Version::GetCanonicalVersionString())
     {
@@ -46,10 +46,12 @@ void CrashUploader::deleteOldCrashDumps()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void CrashUploader::addFormField(QHttpMultiPart* multipart, const QString& name, const QString& value)
+void CrashUploader::addFormField(QHttpMultiPart* multipart, const QString& name,
+                                 const QString& value)
 {
   QHttpPart textPart;
-  textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"" + name + "\""));
+  textPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                     QVariant("form-data; name=\"" + name + "\""));
   textPart.setBody(value.toUtf8());
   multipart->append(textPart);
 }
@@ -87,56 +89,61 @@ void CrashUploader::uploadCrashDump(const QString& version, const QString& path)
   addFormField(multiPart, "version", version);
   addFormField(multiPart, "product", "plexmediaplayer");
   addFormField(multiPart, "uuid", uuid);
-  addFormField(multiPart, "serverUuid", HelperSettings().value("clientId", "NOCLIENTID").toString());
+  addFormField(multiPart, "serverUuid",
+               HelperSettings().value("clientId", "NOCLIENTID").toString());
   addFormField(multiPart, "userId", HelperSettings().value("userId", "NOUSERID").toString());
-  addFormField(multiPart, "platform", QSysInfo::productType() + "-" + QSysInfo::currentCpuArchitecture());
+  addFormField(multiPart, "platform",
+               QSysInfo::productType() + "-" + QSysInfo::currentCpuArchitecture());
 
   QHttpPart dataPart;
   dataPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/octet-stream"));
-  dataPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"dumpfileb64\""));
+  dataPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                     QVariant("form-data; name=\"dumpfileb64\""));
   dataPart.setBody(file.readAll().toBase64());
   multiPart->append(dataPart);
 
   QNetworkReply* reply = m_manager->post(req, multiPart);
   multiPart->setParent(reply);
 
-  connect(reply, &QNetworkReply::sslErrors, [=](const QList<QSslError> & errors)
-  {
-    QLOG_WARN() << "SSL errors:" << errors;
-  });
+  connect(reply, &QNetworkReply::sslErrors,
+          [=](const QList<QSslError>& errors) { QLOG_WARN() << "SSL errors:" << errors; });
 
-  connect(reply, static_cast<void (QNetworkReply::*)()>(&QNetworkReply::finished), [=]()
-  {
-    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+  connect(reply, static_cast<void (QNetworkReply::*)()>(&QNetworkReply::finished),
+          [=]()
+          {
+            QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
 
-    // The only situation in which we retry a failed crash dump upload is when
-    // we get a 503 http status code (we got throttled because we are sending
-    // crashes to quickly), or if the network was unavailable (no status code).
-    // If the server returns any other error, it doesn't want the crash report,
-    // and we just drop it.
-    //
-    if (!statusCode.isValid() || statusCode.toInt() == 503)
-    {
-      QLOG_WARN() << "Failed to submit report with uuid:" << uuid << "will try again later";
-      moveFileBackToIncoming(version, inProgressPath);
-      m_scanTimer->start(5000);
-      return;
-    }
+            // The only situation in which we retry a failed crash dump upload is when
+            // we get a 503 http status code (we got throttled because we are sending
+            // crashes to quickly), or if the network was unavailable (no status code).
+            // If the server returns any other error, it doesn't want the crash report,
+            // and we just drop it.
+            //
+            if (!statusCode.isValid() || statusCode.toInt() == 503)
+            {
+              QLOG_WARN() << "Failed to submit report with uuid:" << uuid << "will try again later";
+              moveFileBackToIncoming(version, inProgressPath);
+              m_scanTimer->start(5000);
+              return;
+            }
 
-    watchCrashDir(false);
-    QDir().mkpath(m_old + "/" + version);
-    QFile::rename(inProgressPath, m_old + "/" + version + "/" + QFileInfo(inProgressPath).fileName());
-    watchCrashDir(true);
+            watchCrashDir(false);
+            QDir().mkpath(m_old + "/" + version);
+            QFile::rename(inProgressPath,
+                          m_old + "/" + version + "/" + QFileInfo(inProgressPath).fileName());
+            watchCrashDir(true);
 
-    if (statusCode.toInt() == 200)
-    {
-      QLOG_INFO() << "Submitted crash report with uuid:" << uuid;
-    }
-    else
-    {
-      QLOG_INFO() << "Server didn't want our crash report with uuid:" << uuid << "giving HTTP status" << statusCode.toInt() << "- saving it in old for now";
-    }
-  });
+            if (statusCode.toInt() == 200)
+            {
+              QLOG_INFO() << "Submitted crash report with uuid:" << uuid;
+            }
+            else
+            {
+              QLOG_INFO() << "Server didn't want our crash report with uuid:" << uuid
+                          << "giving HTTP status" << statusCode.toInt()
+                          << "- saving it in old for now";
+            }
+          });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +168,7 @@ void CrashUploader::uploadAndDeleteCrashDumps()
   watchCrashDir(false);
 
   // loop over all incoming directories, should give us version numbers in d
-  for(const QString& version : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+  for (const QString& version : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
   {
     QDir versionDir(dir);
     versionDir.cd(version);
@@ -169,7 +176,7 @@ void CrashUploader::uploadAndDeleteCrashDumps()
     QLOG_DEBUG() << "Scanning:" << versionDir.path();
 
     int numUploads = 0;
-    for(const QString& entry : versionDir.entryList(filters, QDir::Files))
+    for (const QString& entry : versionDir.entryList(filters, QDir::Files))
     {
       // we only upload 20 crash reports per version
       if (numUploads > 20)
@@ -179,7 +186,7 @@ void CrashUploader::uploadAndDeleteCrashDumps()
       }
 
       uploadCrashDump(version, versionDir.filePath(entry));
-      numUploads ++;
+      numUploads++;
     }
   }
 
@@ -205,11 +212,12 @@ CrashUploader::CrashUploader(QObject* parent) : QObject(parent)
 
   connect(m_scanTimer, &QTimer::timeout, this, &CrashUploader::uploadAndDeleteCrashDumps);
 
-  connect(m_watcher, &QFileSystemWatcher::directoryChanged, [=](const QString& dir)
-  {
-    // wait 2 seconds before starting process dumps.
-    m_scanTimer->start(2000);
-  });
+  connect(m_watcher, &QFileSystemWatcher::directoryChanged,
+          [=](const QString& dir)
+          {
+            // wait 2 seconds before starting process dumps.
+            m_scanTimer->start(2000);
+          });
 
   m_old = Paths::cacheDir("crashdumps/old");
   m_processing = Paths::cacheDir("crashdumps/processing");

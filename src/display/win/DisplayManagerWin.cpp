@@ -9,8 +9,8 @@
 #include <QRect>
 #include <math.h>
 
-#include "QsLog.h"
 #include "DisplayManagerWin.h"
+#include "QsLog.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static DMVideoMode convertDevMode(const DEVMODEW& devmode)
@@ -23,10 +23,8 @@ static DMVideoMode convertDevMode(const DEVMODEW& devmode)
   mode.m_interlaced = !!(devmode.dmDisplayFlags & DM_INTERLACED);
 
   // Windows just returns integer refresh rate so let's fudge it
-  if (mode.m_refreshRate == 59 ||
-      mode.m_refreshRate == 29 ||
-      mode.m_refreshRate == 23)
-      mode.m_refreshRate = (float)(mode.m_refreshRate + 1) / 1.001f;
+  if (mode.m_refreshRate == 59 || mode.m_refreshRate == 29 || mode.m_refreshRate == 23)
+    mode.m_refreshRate = (float)(mode.m_refreshRate + 1) / 1.001f;
 
   return mode;
 }
@@ -34,11 +32,9 @@ static DMVideoMode convertDevMode(const DEVMODEW& devmode)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static bool modeEquals(const DMVideoMode& m1, const DMVideoMode& m2)
 {
-  return m1.m_height == m2.m_height &&
-         m1.m_width == m2.m_width &&
+  return m1.m_height == m2.m_height && m1.m_width == m2.m_width &&
          fabs(m1.m_refreshRate - m2.m_refreshRate) < 1e-9 &&
-         m1.m_bitsPerPixel == m2.m_bitsPerPixel &&
-         m1.m_interlaced == m2.m_interlaced;
+         m1.m_bitsPerPixel == m2.m_bitsPerPixel && m1.m_interlaced == m2.m_interlaced;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +94,8 @@ bool DisplayManagerWin::setDisplayMode(int display, int mode)
 
   if (getModeInfo(display, mode, modeInfo))
   {
-    QLOG_DEBUG() << "Switching to mode" << mode << "on display" << display << ":" << m_displays[display]->m_videoModes[mode]->getPrettyName();
+    QLOG_DEBUG() << "Switching to mode" << mode << "on display" << display << ":"
+                 << m_displays[display]->m_videoModes[mode]->getPrettyName();
 
     modeInfo.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY | DM_DISPLAYFLAGS;
 
@@ -143,7 +140,7 @@ int DisplayManagerWin::getCurrentDisplayMode(int display)
   // check if current mode info matches on of our modes
   for (int modeId = 0; modeId < m_displays[display]->m_videoModes.size(); modeId++)
   {
-    if (modeEquals(mode, * m_displays[display]->m_videoModes[modeId]))
+    if (modeEquals(mode, *m_displays[display]->m_videoModes[modeId]))
       return modeId;
   }
 
@@ -167,14 +164,12 @@ int DisplayManagerWin::getMainDisplay()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-DisplayManagerWin::~DisplayManagerWin()
-{
-}
+DisplayManagerWin::~DisplayManagerWin() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int DisplayManagerWin::getDisplayFromPoint(int x, int y)
 {
-  for(int displayId : m_displays.keys())
+  for (int displayId : m_displays.keys())
   {
     QString dispName = m_displayAdapters[displayId];
 
@@ -183,8 +178,7 @@ int DisplayManagerWin::getDisplayFromPoint(int x, int y)
 
     QLOG_TRACE() << "Looking at display" << displayId << dispName;
 
-    if (!EnumDisplaySettingsW((LPCWSTR)dispName.utf16(), ENUM_CURRENT_SETTINGS,
-                              &modeInfo))
+    if (!EnumDisplaySettingsW((LPCWSTR)dispName.utf16(), ENUM_CURRENT_SETTINGS, &modeInfo))
     {
       QLOG_ERROR() << "Failed to retrieve current mode.";
     }

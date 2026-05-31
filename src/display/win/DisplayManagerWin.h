@@ -1,8 +1,8 @@
 #ifndef DISPLAYMANAGERWIN_H
 #define DISPLAYMANAGERWIN_H
 
-#include <windows.h>
 #include "display/DisplayManager.h"
+#include <windows.h>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Displays
 

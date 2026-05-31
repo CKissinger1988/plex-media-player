@@ -1,9 +1,9 @@
 #ifndef DISPLAYMANAGERRPI_H
 #define DISPLAYMANAGERRPI_H
 
-#include <vector>
 #include <bcm_host.h>
 #include <interface/vmcs_host/vc_tvservice.h>
+#include <vector>
 
 #include "display/DisplayManager.h"
 
@@ -16,7 +16,7 @@ private:
 private Q_SLOTS:
   void handleTvChange(uint32_t reason);
 
-  static void tv_callback(void *callback_data, uint32_t reason, uint32_t param1, uint32_t param2);
+  static void tv_callback(void* callback_data, uint32_t reason, uint32_t param1, uint32_t param2);
 
 Q_SIGNALS:
   void onTvChange(uint32_t reason);

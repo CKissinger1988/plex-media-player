@@ -1,5 +1,5 @@
-#include "QsLog.h"
 #include "BreakPad.h"
+#include "QsLog.h"
 
 void installBreakPadHandler(const QString& name, const QString& destPath)
 {

@@ -21,10 +21,11 @@ bool DisplayManagerX11::initialize()
   if (!resources)
     return false;
 
-  for (int o = 0; o < resources->noutput; o++) {
+  for (int o = 0; o < resources->noutput; o++)
+  {
     RROutput output = resources->outputs[o];
-    XRRCrtcInfo *crtc = NULL;
-    XRROutputInfo *out = XRRGetOutputInfo(xdisplay, resources, output);
+    XRRCrtcInfo* crtc = NULL;
+    XRROutputInfo* out = XRRGetOutputInfo(xdisplay, resources, output);
     if (!out || !out->crtc)
       goto next;
     crtc = XRRGetCrtcInfo(xdisplay, resources, out->crtc);
@@ -38,9 +39,11 @@ bool DisplayManagerX11::initialize()
       display->m_privId = o;
       m_displays[display->m_id] = display;
 
-      for (int om = 0; om < out->nmode; om++) {
+      for (int om = 0; om < out->nmode; om++)
+      {
         RRMode xm = out->modes[om];
-        for (int n = 0; n < resources->nmode; n++) {
+        for (int n = 0; n < resources->nmode; n++)
+        {
           XRRModeInfo m = resources->modes[n];
           if (m.id != xm)
             continue;
@@ -91,8 +94,8 @@ bool DisplayManagerX11::setDisplayMode(int display, int mode)
   RRMode xrmode = resources->modes[videomode->m_privId].id;
 
   bool success = false;
-  XRRCrtcInfo *crtc = NULL;
-  XRROutputInfo *out = XRRGetOutputInfo(xdisplay, resources, output);
+  XRRCrtcInfo* crtc = NULL;
+  XRROutputInfo* out = XRRGetOutputInfo(xdisplay, resources, output);
   if (!out || !out->crtc)
     goto done;
   crtc = XRRGetCrtcInfo(xdisplay, resources, out->crtc);
@@ -100,9 +103,8 @@ bool DisplayManagerX11::setDisplayMode(int display, int mode)
     goto done;
 
   // Keep all information, except the mode.
-  success = XRRSetCrtcConfig(xdisplay, resources, out->crtc, crtc->timestamp,
-                             crtc->x, crtc->y, xrmode, crtc->rotation,
-                             crtc->outputs, crtc->noutput);
+  success = XRRSetCrtcConfig(xdisplay, resources, out->crtc, crtc->timestamp, crtc->x, crtc->y,
+                             xrmode, crtc->rotation, crtc->outputs, crtc->noutput);
 
   // The return value isn't always accurate, apparently.
   success = true;
@@ -126,15 +128,15 @@ int DisplayManagerX11::getCurrentDisplayMode(int display)
   RROutput output = resources->outputs[displayptr->m_privId];
 
   int videomode_id = -1;
-  XRRCrtcInfo *crtc = NULL;
-  XRROutputInfo *out = XRRGetOutputInfo(xdisplay, resources, output);
+  XRRCrtcInfo* crtc = NULL;
+  XRROutputInfo* out = XRRGetOutputInfo(xdisplay, resources, output);
   if (!out || !out->crtc)
     goto done;
   crtc = XRRGetCrtcInfo(xdisplay, resources, out->crtc);
   if (!crtc)
     goto done;
 
-  for(DMVideoModePtr mode : displayptr->m_videoModes)
+  for (DMVideoModePtr mode : displayptr->m_videoModes)
   {
     XRRModeInfo m = resources->modes[mode->m_privId];
     if (crtc->mode == m.id)
@@ -182,8 +184,8 @@ int DisplayManagerX11::getDisplayFromPoint(int x, int y)
   for (int displayid = 0; displayid < m_displays.size(); displayid++)
   {
     RROutput output = resources->outputs[m_displays[displayid]->m_privId];
-    XRRCrtcInfo *crtc = NULL;
-    XRROutputInfo *out = XRRGetOutputInfo(xdisplay, resources, output);
+    XRRCrtcInfo* crtc = NULL;
+    XRROutputInfo* out = XRRGetOutputInfo(xdisplay, resources, output);
     bool matches = false;
     if (!out || !out->crtc)
       goto done;
@@ -191,9 +193,8 @@ int DisplayManagerX11::getDisplayFromPoint(int x, int y)
     if (!crtc)
       goto done;
 
-    matches = x >= crtc->x && y >= crtc->y &&
-              x < crtc->x + crtc->width &&
-              y < crtc->y + crtc->height;
+    matches =
+    x >= crtc->x && y >= crtc->y && x < crtc->x + crtc->width && y < crtc->y + crtc->height;
 
   done:
     if (crtc)

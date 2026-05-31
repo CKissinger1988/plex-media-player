@@ -5,14 +5,14 @@
 #ifndef KONVERGO_HELPERLAUNCHER_H
 #define KONVERGO_HELPERLAUNCHER_H
 
+#include <QJsonObject>
 #include <QLocalSocket>
 #include <QObject>
 #include <QProcess>
-#include <QJsonObject>
 
 #include "LocalJsonClient.h"
-#include "tools/helper/HelperSocket.h"
 #include "Version.h"
+#include "tools/helper/HelperSocket.h"
 #include "utils/Utils.h"
 
 #ifdef Q_OS_MAC
@@ -51,4 +51,4 @@ private:
 #endif
 };
 
-#endif //KONVERGO_HELPERLAUNCHER_H
+#endif // KONVERGO_HELPERLAUNCHER_H

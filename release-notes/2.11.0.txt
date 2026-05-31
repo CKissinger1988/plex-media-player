@@ -3,7 +3,7 @@
 NEW:
 
 - Desktop web-client updated to 3.52.2
-- Qt updated to 5.9.5
+- Qt updated to 6.5.0
 - Updated "(Un)Watched" text to "(Un)Played"
 
 FIXED:

@@ -1,9 +1,9 @@
 #ifndef SIGNALMANAGER_H
 #define SIGNALMANAGER_H
 
+#include <QGuiApplication>
 #include <QObject>
 #include <QSocketNotifier>
-#include <QGuiApplication>
 
 class SignalManager : public QObject
 {

@@ -14,23 +14,26 @@ class SettingsValue : public QObject
 
 public:
   explicit SettingsValue(QObject* parent = nullptr)
-    : QObject(parent)
-    , m_platform(PLATFORM_UNKNOWN)
-    , m_hidden(true)
-    , m_indexOrder(0)
-    , m_hasDescription(false)
-  {}
+    : QObject(parent),
+      m_platform(PLATFORM_UNKNOWN),
+      m_hidden(true),
+      m_indexOrder(0),
+      m_hasDescription(false)
+  {
+  }
 
-  explicit SettingsValue(const QString& _key, QVariant _defaultValue=QVariant(), quint8 platforms = PLATFORM_ANY, QObject* parent = nullptr)
-    : QObject(parent)
-    , m_key(_key)
-    , m_value(QVariant())
-    , m_defaultValue(_defaultValue)
-    , m_platform(platforms)
-    , m_hidden(true)
-    , m_indexOrder(0)
-    , m_hasDescription(false)
-  {}
+  explicit SettingsValue(const QString& _key, QVariant _defaultValue = QVariant(),
+                         quint8 platforms = PLATFORM_ANY, QObject* parent = nullptr)
+    : QObject(parent),
+      m_key(_key),
+      m_value(QVariant()),
+      m_defaultValue(_defaultValue),
+      m_platform(platforms),
+      m_hidden(true),
+      m_indexOrder(0),
+      m_hasDescription(false)
+  {
+  }
 
   const QString& key() const { return m_key; }
 
@@ -41,45 +44,21 @@ public:
     return m_value;
   }
 
-  void setValue(const QVariant& value)
-  {
-    m_value = value;
-  }
+  void setValue(const QVariant& value) { m_value = value; }
 
-  const QVariant& defaultValue() const
-  {
-    return m_defaultValue;
-  }
+  const QVariant& defaultValue() const { return m_defaultValue; }
 
-  void setDefaultValue(const QVariant& defaultValue)
-  {
-    m_defaultValue = defaultValue;
-  }
+  void setDefaultValue(const QVariant& defaultValue) { m_defaultValue = defaultValue; }
 
-  const QVariantList& possibleValues() const
-  {
-    return m_possibleValues;
-  }
+  const QVariantList& possibleValues() const { return m_possibleValues; }
 
-  void setPossibleValues(const QVariantList& possibleValues)
-  {
-    m_possibleValues = possibleValues;
-  }
+  void setPossibleValues(const QVariantList& possibleValues) { m_possibleValues = possibleValues; }
 
-  const quint8 platform() const
-  {
-    return m_platform;
-  }
+  const quint8 platform() const { return m_platform; }
 
-  void setPlatform(quint8 platform)
-  {
-    m_platform = platform;
-  }
+  void setPlatform(quint8 platform) { m_platform = platform; }
 
-  void setHidden(bool hidden)
-  {
-    m_hidden = hidden;
-  }
+  void setHidden(bool hidden) { m_hidden = hidden; }
 
   bool isHidden() const
   {
@@ -87,10 +66,7 @@ public:
     return (m_hidden || !correctPlatform);
   }
 
-  void setInputType(const QString& inputType)
-  {
-    m_inputType = inputType;
-  }
+  void setInputType(const QString& inputType) { m_inputType = inputType; }
 
   void addPossibleValue(const QString& key, const QVariant& value)
   {
@@ -114,17 +90,11 @@ public:
     return ret;
   }
 
-  void setIndexOrder(int order)
-  {
-    m_indexOrder = order;
-  }
+  void setIndexOrder(int order) { m_indexOrder = order; }
 
   int indexOrder() const { return m_indexOrder; }
 
-  void setHasDescription(bool hasDescription)
-  {
-    m_hasDescription = hasDescription;
-  }
+  void setHasDescription(bool hasDescription) { m_hasDescription = hasDescription; }
 
   bool hasDescription() { return m_hasDescription; }
 
@@ -141,5 +111,4 @@ private:
   bool m_hasDescription;
 };
 
-#endif //KONVERGO_SETTINGS_VALUE_H
-
+#endif // KONVERGO_SETTINGS_VALUE_H

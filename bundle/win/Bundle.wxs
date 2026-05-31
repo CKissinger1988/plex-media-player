@@ -233,11 +233,11 @@
         <RemotePayload CertificatePublicKey="4C72A5297C20ADD16A1964578EFFC7CB4EF1D38D" CertificateThumbprint="49DA9A5E21EDC4682AD0211C85D552C86C422F13" Description="KB3099229_x64.msu" Hash="DB92011AB439392E426A82A1F60EF6CC87A63864" ProductName="KB3099229_x64.msu" Size="115805700" Version="1.1.1.1"/>
       </MsuPackage>
 
-      <!-- PMP's msi-->
-      <MsiPackage Id="pmp"
-                  Name="PMP.msi"
+      <!-- SAM's msi-->
+      <MsiPackage Id="sam"
+                  Name="SAM.msi"
                   Compressed="yes"
-                  SourceFile="$(var.OutputPath)/PMP.msi"
+                  SourceFile="$(var.OutputPath)/SAM.msi"
                   Vital="yes">
         <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]" />
         <MsiProperty Name="AUTOLAUNCH" Value="[autolaunch]" />

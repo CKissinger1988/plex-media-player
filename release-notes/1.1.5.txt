@@ -3,7 +3,7 @@ NEW:
   - Updated LibreELEC to version 7.90.006
   - Added always on top setting (thanks to Lukas Pitschl)
   - Enabled power options on Embedded x86 (thanks to Jonathan Leroy)
-  - PMP now selects multi-channel audio over stereo if your system is
+  - SAM now selects multi-channel audio over stereo if your system is
     configured for more channels than 2 in settings.
   - Add audio_delay.25hz setting for tweaking audio delay for 25hz mode
   - Add new mode to force 16:9 aspect ratio for 4:3 video

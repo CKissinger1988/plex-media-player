@@ -3,7 +3,7 @@ NEW:
 - Windows - Added setting to disable native OpenGL. If you are having display problems or crashes on windows, please try our DirectX mode.
 - Added a lot of information to the debug overlay vsync-ratio, audio passthrough, OpenGL version, display status etc.
 - List IPv6 host addresses on debug overlay.
-- Windows - PMP doesn't minimize when it loses focus anymore. We have reverted back to the old behaviour, that means that if you are
+- Windows - SAM doesn't minimize when it loses focus anymore. We have reverted back to the old behaviour, that means that if you are
   in native OpenGL mode you can't alt-tab out of the window. We are going to try to improve this in the future.
 - Added support for host command script that can execute a script. Put a script in the scripts datadir and call
   host script script.py from the inputmap.

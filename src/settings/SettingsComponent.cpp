@@ -1,25 +1,25 @@
 #include "SettingsComponent.h"
-#include "SettingsSection.h"
-#include "Paths.h"
-#include "utils/Utils.h"
-#include "QsLog.h"
 #include "AudioSettingsController.h"
 #include "Names.h"
+#include "Paths.h"
+#include "QsLog.h"
+#include "SettingsSection.h"
+#include "utils/Utils.h"
 
-#include <QSaveFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QList>
-#include <QSettings>
+#include "Version.h"
 #include "input/InputComponent.h"
 #include "system/SystemComponent.h"
-#include "Version.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QList>
+#include <QSaveFile>
+#include <QSettings>
 
 #define OLDEST_PREVIOUS_VERSION_KEY "oldestPreviousVersion"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-SettingsComponent::SettingsComponent(QObject *parent) : ComponentBase(parent), m_settingsVersion(-1)
+SettingsComponent::SettingsComponent(QObject* parent) : ComponentBase(parent), m_settingsVersion(-1)
 {
 }
 
@@ -119,7 +119,8 @@ void SettingsComponent::setSettingCommand(const QString& args)
   printf("val: '%s'\n", settingValue.toUtf8().data());
   if (!value.isValid())
   {
-    QLOG_ERROR() << "Invalid settings value:" << settingValue << "(if it's a string, make sure to quote it)";
+    QLOG_ERROR() << "Invalid settings value:" << settingValue
+                 << "(if it's a string, make sure to quote it)";
     return;
   }
   QLOG_DEBUG() << "Setting" << settingName << "to" << value;
@@ -128,7 +129,8 @@ void SettingsComponent::setSettingCommand(const QString& args)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SettingsComponent::updatePossibleValues(const QString &sectionID, const QString &key, const QVariantList &possibleValues)
+void SettingsComponent::updatePossibleValues(const QString& sectionID, const QString& key,
+                                             const QVariantList& possibleValues)
 {
   SettingsSection* section = getSection(sectionID);
   if (!section)
@@ -146,7 +148,7 @@ QVariant SettingsComponent::allValues(const QString& section)
   if (section.isEmpty())
   {
     QVariantMap all;
-    for(const QString& sname : m_sections.keys())
+    for (const QString& sname : m_sections.keys())
       all[sname] = m_sections[sname]->allValues();
     return all;
   }
@@ -235,7 +237,8 @@ void SettingsComponent::loadConf(const QString& path, bool storage)
     if (version == 0)
       QLOG_ERROR() << "Could not read config file.";
     else
-      QLOG_ERROR() << "Config version is" << version << "but" << m_settingsVersion << "expected. Moving old config to" << backup;
+      QLOG_ERROR() << "Config version is" << version << "but" << m_settingsVersion
+                   << "expected. Moving old config to" << backup;
     // Overwrite/create it with the defaults.
     if (storage)
       saveStorage();
@@ -246,7 +249,7 @@ void SettingsComponent::loadConf(const QString& path, bool storage)
 
   QJsonObject jsonSections = json["sections"].toObject();
 
-  for(const QString& section : jsonSections.keys())
+  for (const QString& section : jsonSections.keys())
   {
     QJsonObject jsonSection = jsonSections[section].toObject();
 
@@ -260,11 +263,12 @@ void SettingsComponent::loadConf(const QString& path, bool storage)
     }
     else if (!sec)
     {
-      QLOG_ERROR() << "Trying to load section:" << section << "from config file, but we don't want that.";
+      QLOG_ERROR() << "Trying to load section:" << section
+                   << "from config file, but we don't want that.";
       continue;
     }
 
-    for(const QString& setting : jsonSection.keys())
+    for (const QString& setting : jsonSection.keys())
       sec->setValue(setting, jsonSection.value(setting).toVariant());
   }
 
@@ -283,7 +287,7 @@ void SettingsComponent::saveSettings()
 
   QVariantMap sections;
 
-  for(SettingsSection* section : m_sections.values())
+  for (SettingsSection* section : m_sections.values())
   {
     if (!section->isStorage())
       sections.insert(section->sectionName(), section->allValues());
@@ -300,7 +304,7 @@ void SettingsComponent::saveStorage()
 {
   QVariantMap storage;
 
-  for(SettingsSection* section : m_sections.values())
+  for (SettingsSection* section : m_sections.values())
   {
     if (section->isStorage())
       storage.insert(section->sectionName(), section->allValues());
@@ -322,7 +326,7 @@ void SettingsComponent::saveSection(SettingsSection* section)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-QVariant SettingsComponent::value(const QString& sectionID, const QString &key)
+QVariant SettingsComponent::value(const QString& sectionID, const QString& key)
 {
   SettingsSection* section = getSection(sectionID);
   if (!section)
@@ -334,7 +338,8 @@ QVariant SettingsComponent::value(const QString& sectionID, const QString &key)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SettingsComponent::setValue(const QString& sectionID, const QString &key, const QVariant &value)
+void SettingsComponent::setValue(const QString& sectionID, const QString& key,
+                                 const QVariant& value)
 {
   SettingsSection* section = getSection(sectionID);
   if (!section)
@@ -388,7 +393,7 @@ void SettingsComponent::setValues(const QVariantMap& options)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SettingsComponent::removeValue(const QString &sectionOrKey)
+void SettingsComponent::removeValue(const QString& sectionOrKey)
 {
   SettingsSection* section = getSection(sectionOrKey);
 
@@ -410,7 +415,7 @@ void SettingsComponent::removeValue(const QString &sectionOrKey)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SettingsComponent::resetToDefault(const QString &sectionID)
+void SettingsComponent::resetToDefault(const QString& sectionID)
 {
   SettingsSection* section = getSection(sectionID);
 
@@ -424,7 +429,7 @@ void SettingsComponent::resetToDefault(const QString &sectionID)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void SettingsComponent::resetToDefaultAll()
 {
-  for(SettingsSection *section : m_sections)
+  for (SettingsSection* section : m_sections)
   {
     section->resetValues();
     saveSection(section);
@@ -434,7 +439,7 @@ void SettingsComponent::resetToDefaultAll()
 /////////////////////////////////////////////////////////////////////////////////////////
 struct SectionOrderIndex
 {
-  inline bool operator ()(SettingsSection* a, SettingsSection* b)
+  inline bool operator()(SettingsSection* a, SettingsSection* b)
   {
     return a->orderIndex() < b->orderIndex();
   }
@@ -448,7 +453,7 @@ QVariantList SettingsComponent::settingDescriptions()
   QList<SettingsSection*> sectionList = m_sections.values();
   std::sort(sectionList.begin(), sectionList.end(), SectionOrderIndex());
 
-  for(SettingsSection* section : sectionList)
+  for (SettingsSection* section : sectionList)
   {
     if (!section->isHidden())
       desc.push_back(QJsonValue::fromVariant(section->descriptions()));
@@ -476,7 +481,7 @@ bool SettingsComponent::loadDescription()
 
   m_sectionIndex = 0;
 
-  for(const QJsonValue& val : doc.array())
+  for (const QJsonValue& val : doc.array())
   {
     if (!val.isObject())
     {
@@ -512,13 +517,13 @@ void SettingsComponent::parseSection(const QJsonObject& sectionObject)
 
   int platformMask = platformMaskFromObject(sectionObject);
 
-  auto  section = new SettingsSection(sectionName, (quint8)platformMask, m_sectionIndex ++, this);
+  auto section = new SettingsSection(sectionName, (quint8)platformMask, m_sectionIndex++, this);
   section->setHidden(sectionObject.value("hidden").toBool(false));
   section->setStorage(sectionObject.value("storage").toBool(false));
 
   auto values = sectionObject.value("values").toArray();
   int order = 0;
-  for(auto val : values)
+  for (auto val : values)
   {
     if (!val.isObject())
       continue;
@@ -533,7 +538,7 @@ void SettingsComponent::parseSection(const QJsonObject& sectionObject)
     {
       defaultval = QVariant();
       // Whichever default matches the current platform first is used.
-      for(const auto& v : defaults.toArray())
+      for (const auto& v : defaults.toArray())
       {
         auto vobj = v.toObject();
         int defPlatformMask = platformMaskFromObject(vobj);
@@ -546,10 +551,11 @@ void SettingsComponent::parseSection(const QJsonObject& sectionObject)
     }
 
     int vPlatformMask = platformMaskFromObject(valobj);
-    SettingsValue* setting = new SettingsValue(valobj.value("value").toString(), defaultval, (quint8)vPlatformMask, this);
+    SettingsValue* setting =
+    new SettingsValue(valobj.value("value").toString(), defaultval, (quint8)vPlatformMask, this);
     setting->setHasDescription(true);
     setting->setHidden(valobj.value("hidden").toBool(false));
-    setting->setIndexOrder(order ++);
+    setting->setIndexOrder(order++);
 
     if (valobj.contains("input_type"))
       setting->setInputType(valobj.value("input_type").toString());
@@ -557,7 +563,7 @@ void SettingsComponent::parseSection(const QJsonObject& sectionObject)
     if (valobj.contains("possible_values") && valobj.value("possible_values").isArray())
     {
       auto list = valobj.value("possible_values").toArray();
-      for(const auto& v : list)
+      for (const auto& v : list)
       {
         int platform = PLATFORM_ANY;
 
@@ -599,7 +605,7 @@ int SettingsComponent::platformMaskFromObject(const QJsonObject& object)
     // platforms can be both array or a single string
     if (platforms.isArray())
     {
-      for(const QJsonValue& pl : platforms.toArray())
+      for (const QJsonValue& pl : platforms.toArray())
       {
         if (!pl.isString())
           continue;
@@ -617,7 +623,7 @@ int SettingsComponent::platformMaskFromObject(const QJsonObject& object)
     QJsonValue val = object.value("platforms_excluded");
     if (val.isArray())
     {
-      for(const QJsonValue& pl : val.toArray())
+      for (const QJsonValue& pl : val.toArray())
       {
         if (!pl.isString())
           continue;
@@ -670,7 +676,7 @@ bool SettingsComponent::componentInitialize()
   // then run the signal the first time to make sure that we set the proper visibility
   // on the items from the start.
   //
-  auto  ctrl = new AudioSettingsController(this);
+  auto ctrl = new AudioSettingsController(this);
   QVariantMap val;
   val.insert("devicetype", value(SETTINGS_SECTION_AUDIO, "devicetype"));
   ctrl->valuesUpdated(val);
@@ -686,7 +692,7 @@ void SettingsComponent::setupVersion()
   m_oldestPreviousVersion = settings.value(OLDEST_PREVIOUS_VERSION_KEY).toString();
   if (m_oldestPreviousVersion.isEmpty())
   {
-    // Version key was not present. It could still be a pre-1.1 PMP install,
+    // Version key was not present. It could still be a pre-1.1 SAM install,
     // so here we try to find out whether this is the very first install, or
     // if an older one exists.
     QFile configFile(Paths::dataDir("plexmediaplayer.conf"));
@@ -704,7 +710,7 @@ void SettingsComponent::setUserRoleList(const QStringList& userRoles)
   QVariantList values;
 
   // Channel names and values are aligned with values expected by plex.tv.
-  // See: https://github.com/plexinc/plex-media-player-private/issues/642
+  // See: https://github.com/plexinc/spartanai-media-private/issues/642
 
   // Public is always available as the default value.
   QVariantMap publicChannel;
@@ -712,21 +718,24 @@ void SettingsComponent::setUserRoleList(const QStringList& userRoles)
   publicChannel.insert("title", "Public");
   values << publicChannel;
 
-  if (userRoles.contains("plexpass")) {
+  if (userRoles.contains("plexpass"))
+  {
     QVariantMap betaChannel;
     betaChannel.insert("value", 8);
     betaChannel.insert("title", "Beta");
     values << betaChannel;
   }
 
-  if (userRoles.contains("ninja")) {
+  if (userRoles.contains("ninja"))
+  {
     QVariantMap alphaChannel;
     alphaChannel.insert("value", 4);
     alphaChannel.insert("title", "Alpha");
     values << alphaChannel;
   }
 
-  if (userRoles.contains("employee")) {
+  if (userRoles.contains("employee"))
+  {
     QVariantMap qaChannel;
     qaChannel.insert("value", 2);
     qaChannel.insert("title", "QA");
@@ -813,4 +822,3 @@ void SettingsComponent::setCommandLineValues(const QStringList& values)
     setValue(SETTINGS_SECTION_MAIN, "layout", "auto");
   }
 }
-

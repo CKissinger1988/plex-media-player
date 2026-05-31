@@ -7,18 +7,18 @@
 
 #include "QsLog.h"
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 #include <QProcess>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 bool UpdateManagerWin32::applyUpdate(const QString& version)
 {
-  QString updateExe = GetPath("PlexMediaPlayer-" + version + "-windows-x64.exe", version, true);
-  if(QFile::exists(updateExe))
+  QString updateExe = GetPath("SpartanAIMedia-" + version + "-windows-x64.exe", version, true);
+  if (QFile::exists(updateExe))
   {
     QStringList args;
-    args << "/passive" << "/norestart" << "/log" << Paths::logDir("Plex Media Player Installer.log");
+    args << "/passive" << "/norestart" << "/log" << Paths::logDir("SpartanAI-Media Installer.log");
     args << "autolaunch=1";
 
     QFile::remove(GetPath("_readyToApply", version, false));

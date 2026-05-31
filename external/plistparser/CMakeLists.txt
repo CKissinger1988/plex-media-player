@@ -1,5 +1,3 @@
-include_directories(.)
-
 add_library(plistparser STATIC
   plistparser.cpp
   plistparser.h
@@ -7,3 +5,4 @@ add_library(plistparser STATIC
   plistserializer.h
 )
 std_target_properties(plistparser)
+target_include_directories(plistparser PUBLIC .)

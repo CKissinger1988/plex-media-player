@@ -1,18 +1,17 @@
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
-if(ENABLE_CRASHDUMP)
-  set(CRASHDUMP_SRCS CrashUploader.cpp CrashUploader.h)
-  add_definitions(-DENABLE_CRASHDUMP -DCRASHDUMP_SECRET="${CRASHDUMP_SECRET}")
-endif(ENABLE_CRASHDUMP)
-
 add_executable(${HELPER_TARGET} WIN32
-  ${CRASHDUMP_SRCS}
   HelperMain.cpp
   HelperSocket.cpp
   HelperSocket.h
 )
 
-target_link_libraries(${HELPER_TARGET} ${Qt5Core_LIBRARIES} ${Qt5Network_LIBRARIES} qslog shared)
+if(ENABLE_CRASHDUMP)
+  target_sources(${HELPER_TARGET} PRIVATE CrashUploader.cpp CrashUploader.h)
+  target_compile_definitions(${HELPER_TARGET} PRIVATE ENABLE_CRASHDUMP CRASHDUMP_SECRET="${CRASHDUMP_SECRET}")
+endif()
+
+target_link_libraries(${HELPER_TARGET} PRIVATE Qt6::Core Qt6::Network qslog shared)
+target_include_directories(${HELPER_TARGET} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+
 std_target_properties(${HELPER_TARGET})
 set_target_properties(${HELPER_TARGET} PROPERTIES
   INSTALL_RPATH "${QTROOT}/lib"
@@ -21,7 +20,7 @@ set_target_properties(${HELPER_TARGET} PROPERTIES
 
 if(APPLE)
   set(PLATFORM_RESOURCE_SUFFIX /../Resources)
-endif(APPLE)
+endif()
 
 add_custom_command(
   TARGET ${HELPER_TARGET}
@@ -31,6 +30,6 @@ add_custom_command(
 
 if(NOT APPLE)
   install(TARGETS ${HELPER_TARGET} DESTINATION ${INSTALL_BIN_DIR})
-endif(NOT APPLE)
+endif()
 
 clang_tidy(${HELPER_TARGET})

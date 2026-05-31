@@ -133,12 +133,12 @@ endfunction()
 add_custom_target(wix_install
                   COMMAND ${CMAKE_COMMAND} -P cmake_install.cmake
                   COMMENT "Copying files..."
-                  DEPENDS PMPHelper PlexMediaPlayer)
+                  DEPENDS SAMHelper SpartanAIMedia)
 
 wix_harvest_directory("${CMAKE_INSTALL_PREFIX}" files.wxs CGROUP ProgramFilesComponentGroup DEPENDS wix_install)
 
-wix_create_installer(PMP.msi 
-                     WXS_FILES files.wxs "${PROJECT_SOURCE_DIR}/bundle/win/PMP.wxs"
+wix_create_installer(SAM.msi 
+                     WXS_FILES files.wxs "${PROJECT_SOURCE_DIR}/bundle/win/SAM.wxs"
                      EXTENSIONS WixUtilExtension WixFirewallExtension
                      BASEDIR "${PROJECT_SOURCE_DIR}/bundle/win"
 )
@@ -149,12 +149,12 @@ else()
   set(INSTALLER_ARCH_STR windows-x86)
 endif()
 
-wix_create_installer(PlexMediaPlayer-${VERSION_STRING}-${INSTALLER_ARCH_STR}.exe
-                     TARGET PlexMediaPlayerInstaller
+wix_create_installer(SpartanAIMedia-${VERSION_STRING}-${INSTALLER_ARCH_STR}.exe
+                     TARGET SpartanAIMediaInstaller
                      WXS_FILES "${PROJECT_SOURCE_DIR}/bundle/win/Bundle.wxs"
                      EXTENSIONS WixUtilExtension WixBalExtension
-                     DEPENDS wix_PMP.msi
+                     DEPENDS wix_SAM.msi
                      BASEDIR "${PROJECT_SOURCE_DIR}/bundle/win"
 )
 
-add_custom_target(windows_package DEPENDS PlexMediaPlayerInstaller)
+add_custom_target(windows_package DEPENDS SpartanAIMediaInstaller)

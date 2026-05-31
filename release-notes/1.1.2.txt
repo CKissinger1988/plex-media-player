@@ -7,9 +7,9 @@ NEW:
   - (Embedded) NVIDIA legacy build is deprecated and incorporated into the Generic build
   - Improved hardware decoding on Windows and x86 Embedded.
   - Qt bumped to version 5.6.1
-  - There has been some changes how PMP is built on Windows and OSX. We no longer bundle
+  - There has been some changes how SAM is built on Windows and OSX. We no longer bundle
     ffmpeg and mpv with the build system and you need to download and install them yourself.
-    This only applies to people that build PMP by themself 
+    This only applies to people that build SAM by themself 
   
 FIXED:
   - There was an issue where the web-client and the playback engine could get out of state
@@ -19,7 +19,7 @@ FIXED:
   - CEC keyhandling is now back to the default (no auto-repeat) beacuse of many incompatiblities.
     If you have a CEC device that gives you press and release events you can enable autorepeat
     by editing the configuration file.
-  - PMP should now install correctly on Windows 10N
-  - PMP can now be built with Qt 5.7
-  - PMP should no longer prevent sleeping on OSX / Windows
+  - SAM should now install correctly on Windows 10N
+  - SAM can now be built with Qt 5.7
+  - SAM should no longer prevent sleeping on OSX / Windows
   - Screensaver should be smooth again

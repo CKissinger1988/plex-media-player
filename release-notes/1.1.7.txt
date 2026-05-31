@@ -2,8 +2,8 @@ NEW:
   - Some audio setting defaults were changed for OSX. Exclusive audio mode is disabled by
     default, and the "Channels" option is now set to "auto" by default.
     This does not affect existing installations, unless you delete or reset your
-    PMP config file.
-  - Removed the "Advanced" checkbox in the audio settings. PMP now behaves the same as if
+    SAM config file.
+  - Removed the "Advanced" checkbox in the audio settings. SAM now behaves the same as if
     "Advanced" was always enabled in previous versions.
   - Added a new "copy-back" hardware decoding setting. Useful only in specific situations.
 

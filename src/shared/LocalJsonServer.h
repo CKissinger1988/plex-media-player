@@ -5,10 +5,10 @@
 #ifndef KONVERGO_LOCALJSONSEVER_H
 #define KONVERGO_LOCALJSONSEVER_H
 
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLocalServer>
 #include <QLocalSocket>
-#include <QJsonObject>
-#include <QJsonDocument>
 
 class LocalJsonServer : public QObject
 {
@@ -35,4 +35,4 @@ private:
   QList<QLocalSocket*> m_clientSockets;
 };
 
-#endif //KONVERGO_LOCALJSONSEVER_H
+#endif // KONVERGO_LOCALJSONSEVER_H

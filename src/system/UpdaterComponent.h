@@ -1,11 +1,11 @@
 #ifndef UPDATERCOMPONENT_H
 #define UPDATERCOMPONENT_H
 
-#include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QCryptographicHash>
 #include <QFile>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QObject>
 #include <QThread>
 #include <QTime>
 #include <time.h>
@@ -20,8 +20,9 @@ class Update : public QObject
 {
   Q_OBJECT
 public:
-  explicit Update(const QString& url = "", const QString& localPath = "",
-         const QString& hash = "", QObject* parent = nullptr) : QObject(parent)
+  explicit Update(const QString& url = "", const QString& localPath = "", const QString& hash = "",
+                  QObject* parent = nullptr)
+    : QObject(parent)
   {
     m_url = url;
     m_localPath = localPath;
@@ -78,8 +79,7 @@ public:
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   bool isReady()
   {
-    if ((m_reply && m_reply->isRunning()) ||
-        (m_openFile && m_openFile->isOpen()))
+    if ((m_reply && m_reply->isRunning()) || (m_openFile && m_openFile->isOpen()))
       return false;
 
     QFile file(m_localPath);
@@ -145,7 +145,7 @@ public:
   Q_INVOKABLE void disable() { m_enabled = false; }
 
   // Disable old API for now
-  Q_INVOKABLE void downloadUpdate(const QVariantMap &updateInfo) { };
+  Q_INVOKABLE void downloadUpdate(const QVariantMap& updateInfo) {};
 
   Q_INVOKABLE void checkForUpdate();
   Q_INVOKABLE void startUpdateDownload(const QVariantHash& updateInfo);
@@ -160,14 +160,14 @@ signals:
   void downloadProgress(qint64 bytesReceived, qint64 total);
 
 private slots:
-  void dlComplete(QNetworkReply *reply);
-  bool fileComplete(Update *update);
+  void dlComplete(QNetworkReply* reply);
+  bool fileComplete(Update* update);
 
 private:
-  explicit UpdaterComponent(QObject *parent = nullptr);
+  explicit UpdaterComponent(QObject* parent = nullptr);
 
   bool isDownloading();
-  void downloadFile(Update *update);
+  void downloadFile(Update* update);
 
   QString m_version;
 

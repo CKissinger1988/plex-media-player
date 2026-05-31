@@ -4,14 +4,14 @@
 #include <QObject>
 #include <QUdpSocket>
 #include <qbytearray.h>
-#include <qhostaddress.h>
 #include <qglobal.h>
+#include <qhostaddress.h>
 
 class GDMManager : public QObject
 {
   Q_OBJECT
 public:
-  explicit GDMManager(QObject *parent = nullptr);
+  explicit GDMManager(QObject* parent = nullptr);
   ~GDMManager() override { stopAnnouncing(); }
   void startAnnouncing();
   void stopAnnouncing();

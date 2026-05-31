@@ -29,9 +29,9 @@ list(APPEND CMAKE_FIND_ROOT_PATH ${QTROOT})
 list(APPEND CMAKE_PREFIX_PATH ${QTROOT})
 include_directories(${QTROOT}/include)
 
-set(REQUIRED_QT_VERSION "5.7.0")
+set(REQUIRED_QT_VERSION "6.2.0")
 
-set(QTCONFIGROOT ${QTROOT}/lib/cmake/Qt5)
+set(QTCONFIGROOT ${QTROOT}/lib/cmake/Qt6)
 set(components Core Network WebChannel Qml Quick Xml WebEngine Widgets)
 
 if(UNIX AND (NOT APPLE) AND ((NOT BUILD_TARGET STREQUAL "RPI")))
@@ -44,7 +44,7 @@ if(LINUX_DBUS)
 endif(LINUX_DBUS)
 
 foreach(COMP ${components})
-	set(mod Qt5${COMP})
+	set(mod Qt6${COMP})
 	
 	# look for the config files in the QtConfigRoot defined above
 	set(${mod}_DIR ${QTCONFIGROOT}${COMP})
@@ -68,10 +68,10 @@ if(QT5_CFLAGS)
   endif(WIN32)
 endif(QT5_CFLAGS)
 
-message(STATUS "Qt version: ${Qt5Core_VERSION_STRING}")
+message(STATUS "Qt version: ${Qt6Core_VERSION_STRING}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QT5_CFLAGS}")
 
-set(CMAKE_REQUIRED_INCLUDES ${Qt5WebEngine_INCLUDE_DIRS};${Qt5WebEngine_PRIVATE_INCLUDE_DIRS})
+set(CMAKE_REQUIRED_INCLUDES ${Qt6WebEngine_INCLUDE_DIRS};${Qt6WebEngine_PRIVATE_INCLUDE_DIRS})
 set(CMAKE_REQUIRED_LIBRARIES ${QT5_LIBRARIES})
 
 include(CheckCXXSourceCompiles)

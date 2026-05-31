@@ -19,4 +19,4 @@ private:
   void setHiddenPassthrough(const QStringList& codecs, bool hidden);
 };
 
-#endif //KONVERGO_AUDIOSETTINGSCONTROLLER_H
+#endif // KONVERGO_AUDIOSETTINGSCONTROLLER_H

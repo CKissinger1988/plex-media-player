@@ -18,10 +18,8 @@ bool CachedRegexMatcher::addMatcher(const QString& pattern, const QVariant& resu
   // Remove older mapping if it exists.
   if (!m_allowMultiplePatterns)
   {
-    auto newEnd = std::remove_if(m_matcherList.begin(),m_matcherList.end(), [pattern](auto mp)
-    {
-      return mp.first.pattern() == pattern;
-    });
+    auto newEnd = std::remove_if(m_matcherList.begin(), m_matcherList.end(),
+                                 [pattern](auto mp) { return mp.first.pattern() == pattern; });
     m_matcherList.erase(newEnd, m_matcherList.end());
   }
 
@@ -39,7 +37,7 @@ QVariantList CachedRegexMatcher::match(const QString& input)
   QVariantList matches;
 
   // otherwise try to iterate our list and find a match
-  for(const MatcherValuePair& matcher : m_matcherList)
+  for (const MatcherValuePair& matcher : m_matcherList)
   {
     QRegExp re(matcher.first);
 
@@ -52,7 +50,7 @@ QVariantList CachedRegexMatcher::match(const QString& input)
       {
         QString value(matcher.second.toString());
 
-        for (int i = 0; i < re.captureCount(); i ++)
+        for (int i = 0; i < re.captureCount(); i++)
         {
           QString argFmt = QString("%%1").arg(i + 1);
           if (value.contains(argFmt))

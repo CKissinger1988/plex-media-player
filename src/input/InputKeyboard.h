@@ -5,9 +5,9 @@
 #ifndef KONVERGO_INPUTKEYBOARD_H
 #define KONVERGO_INPUTKEYBOARD_H
 
-#include <QKeySequence>
 #include "InputComponent.h"
 #include "QsLog.h"
+#include <QKeySequence>
 
 class InputKeyboard : public InputBase
 {
@@ -27,4 +27,4 @@ private:
   explicit InputKeyboard(QObject* parent = nullptr) : InputBase(parent) {}
 };
 
-#endif //KONVERGO_INPUTKEYBOARD_H
+#endif // KONVERGO_INPUTKEYBOARD_H

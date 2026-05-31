@@ -1,9 +1,9 @@
 
 #if defined(__cplusplus)
-#include <Qt>
-#include <QString>
 #include <QList>
-#include <QVariant>
 #include <QObject>
+#include <QString>
+#include <QVariant>
 #include <QWidget>
+#include <Qt>
 #endif

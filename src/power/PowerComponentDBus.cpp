@@ -159,7 +159,7 @@ void PowerComponentDBus::doEnableScreensaver()
       {
         QLOG_ERROR() << "doEnableScreensaver : Error while calling UnInhibit:"
                      << reply.error().message();
-      } 
+      }
     }
     else
     {
@@ -171,4 +171,3 @@ void PowerComponentDBus::doEnableScreensaver()
     QLOG_ERROR() << "doEnableScreensaver : could not find system bus";
   }
 }
-

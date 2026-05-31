@@ -14,6 +14,6 @@ namespace Log
   void UpdateLogLevel();
   void CensorAuthTokens(QString& msg);
   void EnableTerminalOutput();
-}
+} // namespace Log
 
-#endif //PLEXMEDIAPLAYER_LOG_H
+#endif // PLEXMEDIAPLAYER_LOG_H

@@ -12,7 +12,7 @@ class InputAppleMediaKeys : public InputBase
 {
   Q_OBJECT
 public:
-  explicit InputAppleMediaKeys(QObject* parent = nullptr) : InputBase(parent) { }
+  explicit InputAppleMediaKeys(QObject* parent = nullptr) : InputBase(parent) {}
   bool initInput() override;
   const char* inputName() override { return "AppleMediaKeys"; }
 
@@ -33,4 +33,4 @@ private:
   quint64 m_currentTime;
 };
 
-#endif //KONVERGO_INPUTAPPLEMEDIAKEYS_H
+#endif // KONVERGO_INPUTAPPLEMEDIAKEYS_H

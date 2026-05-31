@@ -1,7 +1,7 @@
 
-#include <QGuiApplication>
-#include "QsLog.h"
 #include "InputLIRC.h"
+#include "QsLog.h"
+#include <QGuiApplication>
 
 #define DEFAULT_LIRC_ADDRESS "/run/lirc/lircd"
 
@@ -25,10 +25,7 @@ InputLIRC::~InputLIRC()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool InputLIRC::initInput()
-{
-  return connectToLIRC();
-}
+bool InputLIRC::initInput() { return connectToLIRC(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool InputLIRC::connectToLIRC()
@@ -65,16 +62,10 @@ bool InputLIRC::isConnected()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputLIRC::connected()
-{
-  QLOG_INFO() << "LIRC socket connected ";
-}
+void InputLIRC::connected() { QLOG_INFO() << "LIRC socket connected "; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void InputLIRC::disconnected()
-{
-  QLOG_INFO() << "LIRC socket disconnected ";
-}
+void InputLIRC::disconnected() { QLOG_INFO() << "LIRC socket disconnected "; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void InputLIRC::socketerror(QLocalSocket::LocalSocketError socketError)

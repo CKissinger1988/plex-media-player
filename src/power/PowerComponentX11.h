@@ -1,8 +1,8 @@
 #ifndef POWERCOMPONENTX11_H
 #define POWERCOMPONENTX11_H
 
-#include <QTimer>
 #include <QProcess>
+#include <QTimer>
 
 #include "PowerComponent.h"
 

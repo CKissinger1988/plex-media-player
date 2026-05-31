@@ -3,27 +3,23 @@
 //
 
 #include "EventFilter.h"
-#include "system/SystemComponent.h"
-#include "settings/SettingsComponent.h"
-#include "input/InputKeyboard.h"
 #include "KonvergoWindow.h"
+#include "input/InputKeyboard.h"
+#include "settings/SettingsComponent.h"
+#include "system/SystemComponent.h"
 
 #include <QKeyEvent>
 #include <QObject>
 
-static QStringList desktopWhiteListedKeys = { "Media Play",
-                                              "Media Pause",
-                                              "Media Stop",
-                                              "Media Next",
-                                              "Media Previous",
-                                              "Media Rewind",
-                                              "Media FastForward",
-                                              "Back"};
+static QStringList desktopWhiteListedKeys = { "Media Play",        "Media Pause",
+                                              "Media Stop",        "Media Next",
+                                              "Media Previous",    "Media Rewind",
+                                              "Media FastForward", "Back" };
 // These just happen to be mostly the same.
 static QStringList win32AppcommandBlackListedKeys = desktopWhiteListedKeys;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static QString keyEventToKeyString(QKeyEvent *kevent)
+static QString keyEventToKeyString(QKeyEvent* kevent)
 {
   // We ignore the KeypadModifier here since it's practically useless
   QKeySequence modifiers(kevent->modifiers() &= ~Qt::KeypadModifier);
@@ -64,7 +60,8 @@ bool EventFilter::eventFilter(QObject* watched, QEvent* event)
     // the host yet. We just want to handle some specific keyboard
     // events.
     //
-    if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::ShortcutOverride)
+    if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease ||
+        event->type() == QEvent::ShortcutOverride)
     {
       QKeyEvent* key = dynamic_cast<QKeyEvent*>(event);
 
@@ -91,11 +88,10 @@ bool EventFilter::eventFilter(QObject* watched, QEvent* event)
   SystemComponent& system = SystemComponent::Get();
 
   // ignore mouse events if mouse is disabled
-  if  (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "disablemouse").toBool() &&
-       ((event->type() == QEvent::MouseMove) ||
-        (event->type() == QEvent::MouseButtonPress) ||
-        (event->type() == QEvent::MouseButtonRelease) ||
-        (event->type() == QEvent::MouseButtonDblClick)))
+  if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "disablemouse").toBool() &&
+      ((event->type() == QEvent::MouseMove) || (event->type() == QEvent::MouseButtonPress) ||
+       (event->type() == QEvent::MouseButtonRelease) ||
+       (event->type() == QEvent::MouseButtonDblClick)))
   {
     return true;
   }
@@ -162,7 +158,7 @@ bool EventFilter::eventFilter(QObject* watched, QEvent* event)
   else if (event->type() == QEvent::MouseButtonPress)
   {
     // ignore right clicks that would show context menu
-    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
+    QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
     if ((mouseEvent) && (mouseEvent->button() == Qt::RightButton))
       return true;
   }

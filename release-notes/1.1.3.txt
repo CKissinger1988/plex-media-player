@@ -1,5 +1,5 @@
 NEW:
-  - Qt bumped to version 5.7.0
+  - Qt bumped to version 6.2.0
   - Minor graphics performance improvements on Windows.
   - (Embedded) core OS upgraded to LE 7.0.2.
   - Change how web-client is bundled.

@@ -14,15 +14,17 @@ class InputRoku : public InputBase
   Q_OBJECT
 
 public:
-  explicit InputRoku(QObject* parent = nullptr) : InputBase(parent) { }
+  explicit InputRoku(QObject* parent = nullptr) : InputBase(parent) {}
   bool initInput() override;
   const char* inputName() override { return "roku"; };
 
 private:
   void handleRequest(qhttp::server::QHttpRequest* request, qhttp::server::QHttpResponse* response);
-  void handleQueryApps(qhttp::server::QHttpRequest* request, qhttp::server::QHttpResponse* response);
+  void handleQueryApps(qhttp::server::QHttpRequest* request,
+                       qhttp::server::QHttpResponse* response);
   void handleKeyPress(qhttp::server::QHttpRequest* request, qhttp::server::QHttpResponse* response);
-  void handleQueryDeviceInfo(qhttp::server::QHttpRequest* request, qhttp::server::QHttpResponse* response);
+  void handleQueryDeviceInfo(qhttp::server::QHttpRequest* request,
+                             qhttp::server::QHttpResponse* response);
 
   qhttp::server::QHttpServer* m_server;
   QUdpSocket* m_ssdpSocket;
@@ -33,4 +35,4 @@ private:
   void handleRootInfo(qhttp::server::QHttpRequest* request, qhttp::server::QHttpResponse* response);
 };
 
-#endif //PLEXMEDIAPLAYER_ROKUREMOTECOMPONENT_H
+#endif // PLEXMEDIAPLAYER_ROKUREMOTECOMPONENT_H

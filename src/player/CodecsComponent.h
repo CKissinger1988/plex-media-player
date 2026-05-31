@@ -1,26 +1,28 @@
 #ifndef CODECS_H
 #define CODECS_H
 
-#include <QObject>
-#include <QtCore/qglobal.h>
 #include <QList>
-#include <QSize>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QObject>
 #include <QQueue>
+#include <QSet>
+#include <QSize>
+#include <QTime>
 #include <QUrl>
 #include <QVariant>
-#include <QTime>
-#include <QSet>
+#include <QtCore/qglobal.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum class CodecType {
+enum class CodecType
+{
   Decoder,
   Encoder,
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct CodecDriver {
+struct CodecDriver
+{
   CodecType type; // encoder/decoder
   QString format; // e.g. "h264", the canonical FFmpeg name of the codec
   QString driver; // specific implementation, e.g. "h264" (native) or "h264_mf" (MediaFoundation)
@@ -44,7 +46,8 @@ struct CodecDriver {
   // depending on input media and OS version.
   bool isSystemCodec() const;
 
-  // Return "mf" for Windows codecs, "at" for OSX audio, "mmal" for RPI video, "eae" for EAE, "" otherwise
+  // Return "mf" for Windows codecs, "at" for OSX audio, "mmal" for RPI video, "eae" for EAE, ""
+  // otherwise
   QString getSystemCodecType() const;
 
   bool isWhitelistedSystemAudioCodec() const;
@@ -53,7 +56,8 @@ struct CodecDriver {
   bool valid() { return format.size() > 0; }
 };
 
-struct StreamInfo {
+struct StreamInfo
+{
   bool isVideo, isAudio;
   QString codec;
   QString profile;
@@ -62,13 +66,13 @@ struct StreamInfo {
   QSize videoResolution;
 };
 
-struct PlaybackInfo {
+struct PlaybackInfo
+{
   QList<StreamInfo> streams;            // information for _all_ streams the file has
                                         // (even if not selected)
   QSet<QString> audioPassthroughCodecs; // list of audio formats to pass through
   bool enableAC3Transcoding;            // encode non-stereo to AC3
 };
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Downloader : public QObject
@@ -77,7 +81,8 @@ class Downloader : public QObject
 public:
   typedef QPair<QString, QString> Header;
   typedef QList<Header> HeaderList;
-  explicit Downloader(QVariant userData, const QUrl& url, const HeaderList& headers, QObject* parent);
+  explicit Downloader(QVariant userData, const QUrl& url, const HeaderList& headers,
+                      QObject* parent);
 Q_SIGNALS:
   void done(QVariant userData, bool success, const QByteArray& data);
 
@@ -98,10 +103,7 @@ class CodecsFetcher : public QObject
 {
   Q_OBJECT
 public:
-  CodecsFetcher()
-  : startCodecs(true), m_eaeNeeded(false), m_fetchEAE(false)
-  {
-  }
+  CodecsFetcher() : startCodecs(true), m_eaeNeeded(false), m_fetchEAE(false) {}
 
   // Download the given list of codecs (skip download for codecs already
   // installed). Then call done(userData), regardless of success.
@@ -154,7 +156,8 @@ public:
 
   static const QList<CodecDriver>& getCachedCodecList();
 
-  static QList<CodecDriver> findCodecsByFormat(const QList<CodecDriver>& list, CodecType type, const QString& format);
+  static QList<CodecDriver> findCodecsByFormat(const QList<CodecDriver>& list, CodecType type,
+                                               const QString& format);
   static QList<CodecDriver> determineRequiredCodecs(const PlaybackInfo& info);
 };
 

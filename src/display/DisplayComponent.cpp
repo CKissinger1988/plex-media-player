@@ -1,7 +1,7 @@
 
-#include "QsLog.h"
 #include "DisplayComponent.h"
 #include "DisplayManager.h"
+#include "QsLog.h"
 #include "settings/SettingsComponent.h"
 #include <QGuiApplication>
 #include <QWindow>
@@ -30,9 +30,7 @@ DisplayComponent::DisplayComponent(QObject* parent) : ComponentBase(parent), m_i
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-DisplayComponent::~DisplayComponent()
-{
-}
+DisplayComponent::~DisplayComponent() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool DisplayComponent::initializeDisplayManager()
@@ -68,9 +66,9 @@ bool DisplayComponent::componentInitialize()
     QGuiApplication* app = (QGuiApplication*)QGuiApplication::instance();
 
     connect(app, SIGNAL(screenAdded(QScreen*)), this, SLOT(monitorChange()));
-    connect(app, SIGNAL(screenRemoved(QScreen*)), this,  SLOT(monitorChange()));
+    connect(app, SIGNAL(screenRemoved(QScreen*)), this, SLOT(monitorChange()));
 
-    for(QScreen *screen : app->screens())
+    for (QScreen* screen : app->screens())
     {
       connect(screen, SIGNAL(refreshRateChanged(qreal)), this, SLOT(monitorChange()));
       connect(screen, SIGNAL(geometryChanged(QRect)), this, SLOT(monitorChange()));
@@ -223,7 +221,7 @@ bool DisplayComponent::restorePreviousVideoMode()
     << m_displayManager->m_displays[m_lastDisplay]->m_videoModes[m_lastVideoMode]->getPrettyName()
     << "on display" << m_lastDisplay;
 
-    ret =  m_displayManager->setDisplayMode(m_lastDisplay, m_lastVideoMode);
+    ret = m_displayManager->setDisplayMode(m_lastDisplay, m_lastVideoMode);
   }
 
   m_lastVideoMode = -1;
@@ -231,7 +229,6 @@ bool DisplayComponent::restorePreviousVideoMode()
 
   return ret;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 int DisplayComponent::getApplicationDisplay(bool silent)
@@ -314,10 +311,8 @@ QString DisplayComponent::debugInformation()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static float modeDistance(const DMVideoMode& m1, const DMVideoMode& m2)
 {
-  if (m1.m_height == m2.m_height &&
-      m1.m_width == m2.m_width &&
-      m1.m_bitsPerPixel == m2.m_bitsPerPixel &&
-      m1.m_interlaced == m2.m_interlaced)
+  if (m1.m_height == m2.m_height && m1.m_width == m2.m_width &&
+      m1.m_bitsPerPixel == m2.m_bitsPerPixel && m1.m_interlaced == m2.m_interlaced)
     return fabs(m1.m_refreshRate - m2.m_refreshRate);
   return -1;
 }
@@ -353,7 +348,7 @@ void DisplayComponent::switchCommand(QString command)
   DMVideoMode mode = currentMode;
   int bestMode = -1; // if -1, select it by using the mode variable above
 
-  for(QString a : command.split(" "))
+  for (QString a : command.split(" "))
   {
     a = a.trimmed();
     if (a == "p")
@@ -403,7 +398,7 @@ void DisplayComponent::switchCommand(QString command)
   {
     QLOG_INFO() << "Mode requested by command:" << mode.getPrettyName();
 
-    for(auto cur : m_displayManager->m_displays[currentDisplay]->m_videoModes)
+    for (auto cur : m_displayManager->m_displays[currentDisplay]->m_videoModes)
     {
       // "Score" according to what was requested
       float dCur = modeDistance(*cur, mode);
@@ -416,8 +411,8 @@ void DisplayComponent::switchCommand(QString command)
       else
       {
         // "Score" according to best mode
-        float dBest = modeDistance(*m_displayManager->m_displays[currentDisplay]->m_videoModes[bestMode],
-                                    mode);
+        float dBest =
+        modeDistance(*m_displayManager->m_displays[currentDisplay]->m_videoModes[bestMode], mode);
         if (dCur < dBest)
           bestMode = cur->m_id;
       }
@@ -426,7 +421,9 @@ void DisplayComponent::switchCommand(QString command)
 
   if (bestMode >= 0)
   {
-    QLOG_INFO() << "Found mode to switch to:" << m_displayManager->m_displays[currentDisplay]->m_videoModes[bestMode]->getPrettyName();
+    QLOG_INFO()
+    << "Found mode to switch to:"
+    << m_displayManager->m_displays[currentDisplay]->m_videoModes[bestMode]->getPrettyName();
     if (m_displayManager->setDisplayMode(currentDisplay, bestMode))
     {
       m_lastDisplay = m_lastVideoMode = -1;

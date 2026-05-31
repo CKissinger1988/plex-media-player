@@ -5,19 +5,20 @@
 #ifndef KONVERGO_UNIQUEAPPLICATION_H
 #define KONVERGO_UNIQUEAPPLICATION_H
 
-#include <QObject>
-#include "Paths.h"
-#include "LocalJsonServer.h"
 #include "LocalJsonClient.h"
+#include "LocalJsonServer.h"
+#include "Paths.h"
 #include "utils/Utils.h"
+#include <QObject>
 
-#define SOCKET_NAME "pmpUniqueApplication"
+#define SOCKET_NAME "samUniqueApplication"
 
 class UniqueApplication : public QObject
 {
   Q_OBJECT
 public:
-  explicit UniqueApplication(QObject* parent = nullptr, const QString& socketname = SOCKET_NAME) : QObject(parent)
+  explicit UniqueApplication(QObject* parent = nullptr, const QString& socketname = SOCKET_NAME)
+    : QObject(parent)
   {
     m_socketName = socketname;
   }
@@ -26,12 +27,13 @@ public:
   {
     m_server = new LocalJsonServer(m_socketName, this);
 
-    connect(m_server, &LocalJsonServer::messageReceived, [=](const QVariant& message)
-    {
-      QVariantMap map = message.toMap();
-      if (map.contains("command") && map.value("command").toString() == "appStart")
-        emit otherApplicationStarted();
-    });
+    connect(m_server, &LocalJsonServer::messageReceived,
+            [=](const QVariant& message)
+            {
+              QVariantMap map = message.toMap();
+              if (map.contains("command") && map.value("command").toString() == "appStart")
+                emit otherApplicationStarted();
+            });
 
     if (!m_server->listen())
       throw FatalException("Failed to listen to uniqueApp socket: " + m_server->errorString());
@@ -71,4 +73,4 @@ private:
   QString m_socketName;
 };
 
-#endif //KONVERGO_UNIQUEAPPLICATION_H
+#endif // KONVERGO_UNIQUEAPPLICATION_H

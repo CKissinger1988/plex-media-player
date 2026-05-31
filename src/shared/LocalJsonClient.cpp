@@ -2,9 +2,9 @@
 // Created by Tobias Hieta on 30/08/15.
 //
 
-#include "Paths.h"
 #include "LocalJsonClient.h"
 #include "LocalJsonServer.h"
+#include "Paths.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 LocalJsonClient::LocalJsonClient(const QString serverPath, QObject* parent) : QLocalSocket(parent)
@@ -29,6 +29,6 @@ bool LocalJsonClient::sendMessage(const QVariantMap& message)
 void LocalJsonClient::readyRead()
 {
   QVariantList list = LocalJsonServer::readFromSocket(this);
-  for(const QVariant& msg : list)
+  for (const QVariant& msg : list)
     emit messageReceived(msg.toMap());
 }

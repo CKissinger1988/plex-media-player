@@ -2,16 +2,16 @@
 // Created by Tobias Hieta on 01/09/15.
 //
 
-#include "settings/SettingsSection.h"
 #include "Paths.h"
+#include "settings/SettingsSection.h"
 
-#include <QDir>
-#include <QStandardPaths>
-#include <QGuiApplication>
-#include <QsLog.h>
-#include <QtGui/qguiapplication.h>
 #include "Names.h"
 #include "Version.h"
+#include <QDir>
+#include <QGuiApplication>
+#include <QStandardPaths>
+#include <QsLog.h>
+#include <QtGui/qguiapplication.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 static QDir writableLocation(QStandardPaths::StandardLocation loc)
@@ -40,12 +40,9 @@ QString Paths::resourceDir(const QString& file)
   auto appResourceDir = QGuiApplication::applicationDirPath() + "/";
   auto prefixDir = QString(PREFIX);
 
-  QStringList possibleResourceDirs = {
-    appResourceDir,
-    appResourceDir + "../Resources/",
-    prefixDir + "/share/plexmediaplayer/",
-    prefixDir + "/plexmediaplayer/"
-  };
+  QStringList possibleResourceDirs = { appResourceDir, appResourceDir + "../Resources/",
+                                       prefixDir + "/share/plexmediaplayer/",
+                                       prefixDir + "/plexmediaplayer/" };
 
   for (const auto& fileStr : possibleResourceDirs)
   {
@@ -78,7 +75,8 @@ QString Paths::cacheDir(const QString& file)
 QString Paths::logDir(const QString& file)
 {
 #ifdef Q_OS_MAC
-  QDir ldir = QDir(QStandardPaths::locate(QStandardPaths::HomeLocation, "", QStandardPaths::LocateDirectory));
+  QDir ldir =
+  QDir(QStandardPaths::locate(QStandardPaths::HomeLocation, "", QStandardPaths::LocateDirectory));
   ldir.mkpath(ldir.absolutePath() + "/Library/Logs/" + Names::MainName());
   ldir.cd("Library/Logs/" + Names::MainName());
   return ldir.filePath(file);
@@ -95,15 +93,15 @@ QString Paths::socketName(const QString& serverName)
 {
   QString userName = qgetenv("USER");
 
-  if(userName.isEmpty())
+  if (userName.isEmpty())
     userName = qgetenv("USERNAME");
-  if(userName.isEmpty())
+  if (userName.isEmpty())
     userName = "unknown";
 
 #ifdef Q_OS_UNIX
-  return QString("/tmp/pmp_%1_%2.sock").arg(serverName).arg(userName);
+  return QString("/tmp/sam_%1_%2.sock").arg(serverName).arg(userName);
 #else
-  return QString("pmp_%1_%2.sock").arg(serverName).arg(userName);
+  return QString("sam_%1_%2.sock").arg(serverName).arg(userName);
 #endif
 }
 

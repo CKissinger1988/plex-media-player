@@ -1,10 +1,10 @@
-#include <QVariant>
-#include <QIODevice>
-#include <QImage>
 #include <QColor>
+#include <QDateTime>
 #include <QDebug>
 #include <QElapsedTimer>
-#include <QDateTime>
+#include <QIODevice>
+#include <QImage>
+#include <QVariant>
 
 #include "QRPIJpegHandler.h"
 
@@ -42,10 +42,7 @@ QRPIJpegHandler::~QRPIJpegHandler()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool QRPIJpegHandler::canRead() const
-{
-  return canRead(device());
-}
+bool QRPIJpegHandler::canRead() const { return canRead(device()); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool QRPIJpegHandler::canRead(QIODevice* device)
@@ -88,10 +85,9 @@ bool QRPIJpegHandler::read(QImage* image)
       }
 
       //*image = decodedImage;
-      qDebug() << QDateTime::currentDateTime().toMSecsSinceEpoch()
-               << "QRPIJpegHandler : decoded a"
-               << m_dec_request.width << "x" << m_dec_request.height
-               << "image in" << timer.elapsed() << "ms";
+      qDebug() << QDateTime::currentDateTime().toMSecsSinceEpoch() << "QRPIJpegHandler : decoded a"
+               << m_dec_request.width << "x" << m_dec_request.height << "image in"
+               << timer.elapsed() << "ms";
 
       return true;
     }
@@ -100,7 +96,6 @@ bool QRPIJpegHandler::read(QImage* image)
       qWarning() << "QRPIJpegHandler : Decoding failed with status" << status;
       return false;
     }
-
   }
   else
   {
@@ -155,13 +150,14 @@ bool QRPIJpegHandler::readJpegSize(QIODevice* device, QSize& size) const
     }
     else
     {
-       qWarning() << "readJpegSize : could not read " << sizeof(header) << "bytes, read " << bytesRead;
-       return false;
+      qWarning() << "readJpegSize : could not read " << sizeof(header) << "bytes, read "
+                 << bytesRead;
+      return false;
     }
   }
   else
   {
-    qWarning() << "readJpegSize : device " << device << "can't be read!" ;
+    qWarning() << "readJpegSize : device " << device << "can't be read!";
     return false;
   }
 

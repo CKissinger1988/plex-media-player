@@ -10,10 +10,10 @@
 class UpdateManagerWin32 : public UpdateManager
 {
 public:
-  explicit UpdateManagerWin32(QObject *parent = nullptr) {};
+  explicit UpdateManagerWin32(QObject* parent = nullptr) {};
   ~UpdateManagerWin32() override {};
 
   bool applyUpdate(const QString& version) override;
 };
 
-#endif //PLEXMEDIAPLAYER_UPDATEMANAGERWIN32_H
+#endif // PLEXMEDIAPLAYER_UPDATEMANAGERWIN32_H

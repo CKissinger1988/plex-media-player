@@ -5,10 +5,10 @@
 #ifndef KONVERGO_CACHEDREGEXMATCHER_H
 #define KONVERGO_CACHEDREGEXMATCHER_H
 
-#include <QRegExp>
-#include <QVariant>
-#include <QString>
 #include <QHash>
+#include <QRegExp>
+#include <QString>
+#include <QVariant>
 
 typedef QPair<QRegExp, QVariant> MatcherValuePair;
 typedef QList<MatcherValuePair> MatcherValueList;
@@ -17,7 +17,9 @@ class CachedRegexMatcher : public QObject
 {
 public:
   explicit CachedRegexMatcher(bool allowMultiplePatterns = true, QObject* parent = nullptr)
-    : QObject(parent), m_allowMultiplePatterns(allowMultiplePatterns) {}
+    : QObject(parent), m_allowMultiplePatterns(allowMultiplePatterns)
+  {
+  }
 
   bool addMatcher(const QString& pattern, const QVariant& result);
   QVariantList match(const QString& input);
@@ -29,4 +31,4 @@ private:
   bool m_allowMultiplePatterns;
 };
 
-#endif //KONVERGO_CACHEDREGEXMATCHER_H
+#endif // KONVERGO_CACHEDREGEXMATCHER_H

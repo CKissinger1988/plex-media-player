@@ -5,13 +5,13 @@
 #ifndef KONVERGO_CRASHUPLOADER_H
 #define KONVERGO_CRASHUPLOADER_H
 
-#include <QObject>
+#include "Version.h"
 #include <QMutex>
+#include <QObject>
+#include <qfilesystemwatcher.h>
 #include <qhttpmultipart.h>
 #include <qnetworkreply.h>
-#include <qfilesystemwatcher.h>
 #include <qtimer.h>
-#include "Version.h"
 
 class CrashUploader : public QObject
 {
@@ -23,7 +23,10 @@ public:
 private:
   Q_SLOT void uploadCrashDump(const QString& version, const QString& path);
 
-  QString incomingCurrentVersion() { return m_incoming + "/" + Version::GetCanonicalVersionString(); }
+  QString incomingCurrentVersion()
+  {
+    return m_incoming + "/" + Version::GetCanonicalVersionString();
+  }
   void deleteOldCrashDumps();
   void addFormField(QHttpMultiPart* multipart, const QString& name, const QString& value);
   void uploadAndDeleteCrashDumps();
@@ -38,4 +41,4 @@ private:
   QMutex m_scanLock;
 };
 
-#endif //KONVERGO_CRASHUPLOADER_H
+#endif // KONVERGO_CRASHUPLOADER_H

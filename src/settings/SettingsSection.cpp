@@ -2,8 +2,14 @@
 #include "QsLog.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-SettingsSection::SettingsSection(const QString& sectionID, quint8 platforms, int _orderIndex, QObject* parent)
-  : QObject(parent), m_sectionID(sectionID), m_orderIndex(_orderIndex), m_platform(platforms), m_hidden(false), m_storage(false)
+SettingsSection::SettingsSection(const QString& sectionID, quint8 platforms, int _orderIndex,
+                                 QObject* parent)
+  : QObject(parent),
+    m_sectionID(sectionID),
+    m_orderIndex(_orderIndex),
+    m_platform(platforms),
+    m_hidden(false),
+    m_storage(false)
 {
   m_values.clear();
 }
@@ -13,7 +19,8 @@ void SettingsSection::registerSetting(SettingsValue* value)
 {
   if (m_values.contains(value->key()))
   {
-    QLOG_WARN() << QString("Trying to register %1.%2 multiple times").arg(m_sectionID).arg(value->key());
+    QLOG_WARN()
+    << QString("Trying to register %1.%2 multiple times").arg(m_sectionID).arg(value->key());
     return;
   }
 
@@ -28,13 +35,13 @@ void SettingsSection::setValues(const QVariant& values)
   QVariantMap updatedValues;
 
   // values not included in the map are "removed"
-  for(const QString& key : m_values.keys())
+  for (const QString& key : m_values.keys())
   {
     if (!map.contains(key))
       resetValueNoNotify(key, updatedValues);
   }
 
-  for(const QString& key : map.keys())
+  for (const QString& key : map.keys())
   {
     if (key.isEmpty())
       continue;
@@ -69,7 +76,8 @@ QVariant SettingsSection::defaultValue(const QString& key)
   if (m_values.contains(key))
     return m_values[key]->defaultValue();
 
-  QLOG_WARN() << "Looking for defaultValue:" << key << "in section:" << m_sectionID << "but it can't be found";
+  QLOG_WARN() << "Looking for defaultValue:" << key << "in section:" << m_sectionID
+              << "but it can't be found";
   return QVariant();
 }
 
@@ -79,12 +87,13 @@ QVariant SettingsSection::value(const QString& key)
   if (m_values.contains(key))
     return m_values[key]->value();
 
-  QLOG_WARN() << "Looking for value:" << key << "in section:" << m_sectionID << "but it can't be found";
+  QLOG_WARN() << "Looking for value:" << key << "in section:" << m_sectionID
+              << "but it can't be found";
   return QVariant();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SettingsSection::updatePossibleValues(const QString &key, const QVariantList &possibleValues)
+void SettingsSection::updatePossibleValues(const QString& key, const QVariantList& possibleValues)
 {
   if (m_values.contains(key))
     m_values[key]->setPossibleValues(possibleValues);
@@ -107,7 +116,7 @@ bool SettingsSection::setValue(const QString& key, const QVariant& value)
 
   QVariantMap values;
   // populate with default values (setValues() resets missing values)
-  for(const QString& entry : m_values.keys())
+  for (const QString& entry : m_values.keys())
     values[entry] = m_values[entry]->value();
 
   values[key] = value;
@@ -139,7 +148,7 @@ void SettingsSection::resetValueNoNotify(const QString& key, QVariantMap& update
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SettingsSection::resetValue(const QString &key)
+void SettingsSection::resetValue(const QString& key)
 {
   QVariantMap updatedValues;
 
@@ -166,7 +175,7 @@ const QVariantMap SettingsSection::allValues() const
 {
   QVariantMap values;
 
-  for(SettingsValue* val : m_values.values())
+  for (SettingsValue* val : m_values.values())
     values[val->key()] = val->value();
 
   return values;
@@ -192,7 +201,7 @@ const QVariantMap SettingsSection::descriptions() const
   std::sort(list.begin(), list.end(), ValueSortOrder());
 
   QVariantList settings;
-  for(SettingsValue* value : list)
+  for (SettingsValue* value : list)
   {
     if (!value->isHidden())
       settings.push_back(value->descriptions());

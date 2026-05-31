@@ -1,25 +1,25 @@
 #include "KonvergoWindow.h"
-#include <QTimer>
-#include <QJsonObject>
-#include <QScreen>
-#include <QQuickItem>
 #include <QGuiApplication>
+#include <QJsonObject>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QQuickItem>
+#include <QScreen>
+#include <QTimer>
 
+#include "EventFilter.h"
+#include "Globals.h"
+#include "QsLog.h"
 #include "core/Version.h"
-#include "system/UpdaterComponent.h"
+#include "display/DisplayComponent.h"
 #include "input/InputKeyboard.h"
+#include "player/PlayerComponent.h"
+#include "player/PlayerQuickItem.h"
 #include "settings/SettingsComponent.h"
 #include "settings/SettingsSection.h"
 #include "system/SystemComponent.h"
-#include "player/PlayerComponent.h"
-#include "player/PlayerQuickItem.h"
-#include "display/DisplayComponent.h"
-#include "QsLog.h"
+#include "system/UpdaterComponent.h"
 #include "utils/Utils.h"
-#include "Globals.h"
-#include "EventFilter.h"
 
 #ifdef USE_X11EXTRAS
 #include <QX11Info>
@@ -39,19 +39,21 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-KonvergoWindow::KonvergoWindow(QWindow* parent) :
-  QQuickWindow(parent),
-  m_debugLayer(false),
-  m_ignoreFullscreenSettingsChange(0),
-  m_showedUpdateDialog(false),
-  m_osxPresentationOptions(0)
+KonvergoWindow::KonvergoWindow(QWindow* parent)
+  : QQuickWindow(parent),
+    m_debugLayer(false),
+    m_ignoreFullscreenSettingsChange(0),
+    m_showedUpdateDialog(false),
+    m_osxPresentationOptions(0)
 {
-  // NSWindowCollectionBehaviorFullScreenPrimary is only set on OSX if Qt::WindowFullscreenButtonHint is set on the window.
+  // NSWindowCollectionBehaviorFullScreenPrimary is only set on OSX if
+  // Qt::WindowFullscreenButtonHint is set on the window.
   setFlags(flags() | Qt::WindowFullscreenButtonHint);
 
   m_infoTimer = new QTimer(this);
   m_infoTimer->setInterval(1000);
-  m_webDesktopMode = (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "webMode").toString() == "desktop");
+  m_webDesktopMode =
+  (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "webMode").toString() == "desktop");
 
   installEventFilter(new EventFilter(this));
 
@@ -81,46 +83,44 @@ KonvergoWindow::KonvergoWindow(QWindow* parent) :
     if (dpy)
     {
       WId win = winId();
-      XChangeProperty(dpy, win,
-                      XInternAtom(dpy, "_GTK_THEME_VARIANT", false),
-                      XInternAtom(dpy, "UTF8_STRING", false),
-                      8, PropModeReplace, (unsigned char *) "dark", 4);
+      XChangeProperty(dpy, win, XInternAtom(dpy, "_GTK_THEME_VARIANT", false),
+                      XInternAtom(dpy, "UTF8_STRING", false), 8, PropModeReplace,
+                      (unsigned char*)"dark", 4);
     }
   }
 #endif
 
   QRect loadedGeo = loadGeometry();
 
-  connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_MAIN), &SettingsSection::valuesUpdated,
-          this, &KonvergoWindow::updateMainSectionSettings);
+  connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_MAIN),
+          &SettingsSection::valuesUpdated, this, &KonvergoWindow::updateMainSectionSettings);
 
-  connect(this, &KonvergoWindow::visibilityChanged,
-          this, &KonvergoWindow::onVisibilityChanged);
+  connect(this, &KonvergoWindow::visibilityChanged, this, &KonvergoWindow::onVisibilityChanged);
 
-  connect(this, &KonvergoWindow::screenChanged,
-          this, &KonvergoWindow::updateCurrentScreen, Qt::QueuedConnection);
-  connect(this, &KonvergoWindow::xChanged,
-          this, &KonvergoWindow::updateCurrentScreen, Qt::QueuedConnection);
-  connect(this, &KonvergoWindow::yChanged,
-          this, &KonvergoWindow::updateCurrentScreen, Qt::QueuedConnection);
-  connect(this, &KonvergoWindow::visibilityChanged,
-          this, &KonvergoWindow::updateCurrentScreen, Qt::QueuedConnection);
-  connect(this, &KonvergoWindow::windowStateChanged,
-          this, &KonvergoWindow::updateCurrentScreen, Qt::QueuedConnection);
+  connect(this, &KonvergoWindow::screenChanged, this, &KonvergoWindow::updateCurrentScreen,
+          Qt::QueuedConnection);
+  connect(this, &KonvergoWindow::xChanged, this, &KonvergoWindow::updateCurrentScreen,
+          Qt::QueuedConnection);
+  connect(this, &KonvergoWindow::yChanged, this, &KonvergoWindow::updateCurrentScreen,
+          Qt::QueuedConnection);
+  connect(this, &KonvergoWindow::visibilityChanged, this, &KonvergoWindow::updateCurrentScreen,
+          Qt::QueuedConnection);
+  connect(this, &KonvergoWindow::windowStateChanged, this, &KonvergoWindow::updateCurrentScreen,
+          Qt::QueuedConnection);
 
-  connect(this, &KonvergoWindow::enableVideoWindowSignal,
-          this, &KonvergoWindow::enableVideoWindow, Qt::QueuedConnection);
+  connect(this, &KonvergoWindow::enableVideoWindowSignal, this, &KonvergoWindow::enableVideoWindow,
+          Qt::QueuedConnection);
 
-  connect(&PlayerComponent::Get(), &PlayerComponent::windowVisible,
-          this, &KonvergoWindow::playerWindowVisible, Qt::QueuedConnection);
+  connect(&PlayerComponent::Get(), &PlayerComponent::windowVisible, this,
+          &KonvergoWindow::playerWindowVisible, Qt::QueuedConnection);
 
   // this is using old syntax because ... reasons. QQuickCloseEvent is not public class
   connect(this, SIGNAL(closing(QQuickCloseEvent*)), this, SLOT(closingWindow()));
 
   connect(qApp, &QCoreApplication::aboutToQuit, this, &KonvergoWindow::closingWindow);
 
-  connect(&UpdaterComponent::Get(), &UpdaterComponent::downloadComplete,
-          this, &KonvergoWindow::showUpdateDialog);
+  connect(&UpdaterComponent::Get(), &UpdaterComponent::downloadComplete, this,
+          &KonvergoWindow::showUpdateDialog);
 
 #ifdef Q_OS_MAC
   m_osxPresentationOptions = 0;
@@ -154,16 +154,17 @@ void KonvergoWindow::showUpdateDialog()
     message->setIcon(QMessageBox::Information);
     message->setWindowModality(Qt::ApplicationModal);
     message->setWindowTitle("Update found!");
-    message->setText("An update to Plex Media Player was found");
-    auto infoText = QString("You are currently running version %0\nDo you wish to install version %1 now?")
-      .arg(currentVersion)
-      .arg(newVersion);
+    message->setText("An update to SpartanAI-Media was found");
+    auto infoText =
+    QString("You are currently running version %0\nDo you wish to install version %1 now?")
+    .arg(currentVersion)
+    .arg(newVersion);
     message->setInformativeText(infoText);
 
     auto details = QString("ChangeLog for version %0\n\nNew:\n%1\n\nFixed:\n%2")
-      .arg(newVersion)
-      .arg(updateInfo["new"].toString())
-      .arg(updateInfo["fixed"].toString());
+                   .arg(newVersion)
+                   .arg(updateInfo["new"].toString())
+                   .arg(updateInfo["fixed"].toString());
 
     message->setDetailedText(details);
 
@@ -173,15 +174,16 @@ void KonvergoWindow::showUpdateDialog()
     message->setDefaultButton(updateNow);
 
     m_showedUpdateDialog = true;
-    connect(message, &QMessageBox::buttonClicked, [=](QAbstractButton* button)
-    {
-      if (button == updateNow)
-        UpdaterComponent::Get().doUpdate();
-      else if (button == updateLater)
-        message->close();
+    connect(message, &QMessageBox::buttonClicked,
+            [=](QAbstractButton* button)
+            {
+              if (button == updateNow)
+                UpdaterComponent::Get().doUpdate();
+              else if (button == updateLater)
+                message->close();
 
-      message->deleteLater();
-    });
+              message->deleteLater();
+            });
 
     message->show();
   }
@@ -197,15 +199,12 @@ void KonvergoWindow::closingWindow()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-KonvergoWindow::~KonvergoWindow()
-{
-  DisplayComponent::Get().setApplicationWindow(nullptr);
-}
+KonvergoWindow::~KonvergoWindow() { DisplayComponent::Get().setApplicationWindow(nullptr); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool KonvergoWindow::fitsInScreens(const QRect& rc)
 {
-  for(QScreen *screen : QGuiApplication::screens())
+  for (QScreen* screen : QGuiApplication::screens())
   {
     if (screen->virtualGeometry().isValid() && screen->virtualGeometry().contains(rc))
       return true;
@@ -229,11 +228,13 @@ void KonvergoWindow::saveGeometry()
 
   QLOG_DEBUG() << "Saving window geometry:" << rc;
 
-  QVariantMap map = {{"x", rc.x()}, {"y", rc.y()},
-                     {"width", rc.width()}, {"height", rc.height()}};
+  QVariantMap map = {
+    { "x", rc.x() }, { "y", rc.y() }, { "width", rc.width() }, { "height", rc.height() }
+  };
   SettingsComponent::Get().setValue(SETTINGS_SECTION_STATE, "geometry", map);
-  QScreen *curScreen = screen();
-  SettingsComponent::Get().setValue(SETTINGS_SECTION_STATE, "lastUsedScreen", curScreen ? curScreen->name() : "");
+  QScreen* curScreen = screen();
+  SettingsComponent::Get().setValue(SETTINGS_SECTION_STATE, "lastUsedScreen",
+                                    curScreen ? curScreen->name() : "");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,9 +259,9 @@ QRect KonvergoWindow::loadGeometry()
       // resolution for the screen (i.e. fullscreen) otherwise it will
       // just scale the webcontent to the minimum size we have defined
       //
-  #ifndef Q_OS_MAC
+#ifndef Q_OS_MAC
       nsize = myScreen->geometry();
-  #endif
+#endif
       setGeometry(nsize);
 
       setScreen(myScreen);
@@ -279,7 +280,7 @@ QRect KonvergoWindow::loadGeometry()
 QRect KonvergoWindow::loadGeometryRect()
 {
   // if we dont have anything, default to 720p in the middle of the screen
-  QScreen *curScreen = screen();
+  QScreen* curScreen = screen();
   QRect defaultRect = QRect(0, 0, WEBUI_SIZE.width(), WEBUI_SIZE.height());
   if (curScreen)
   {
@@ -357,7 +358,7 @@ void KonvergoWindow::setAlwaysOnTop(bool enable)
 void KonvergoWindow::playerWindowVisible(bool visible)
 {
   // adjust webengineview transparecy depending on player visibility
-  QQuickItem *web = findChild<QQuickItem *>("web");
+  QQuickItem* web = findChild<QQuickItem*>("web");
   if (web)
     web->setProperty("backgroundColor", visible ? "transparent" : "#000000");
 
@@ -381,7 +382,8 @@ void KonvergoWindow::updateMainSectionSettings(const QVariantMap& values)
   // update mouse visibility if needed
   if (values.find("disablemouse") != values.end())
   {
-    SystemComponent::Get().setCursorVisibility(!SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "disablemouse").toBool());
+    SystemComponent::Get().setCursorVisibility(
+    !SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "disablemouse").toBool());
   }
 
   if (values.contains("alwaysOnTop"))
@@ -394,7 +396,8 @@ void KonvergoWindow::updateMainSectionSettings(const QVariantMap& values)
   {
     InputComponent::Get().cancelAutoRepeat();
     bool oldDesktopMode = m_webDesktopMode;
-    bool newDesktopMode = (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "webMode").toString() == "desktop");
+    bool newDesktopMode =
+    (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "webMode").toString() == "desktop");
 
     if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "layout").toString() != "auto")
     {
@@ -410,16 +413,17 @@ void KonvergoWindow::updateMainSectionSettings(const QVariantMap& values)
     {
       if (oldDesktopMode != newDesktopMode)
       {
-        QTimer::singleShot(0, [this, newDesktopMode]
-        {
-          PlayerComponent::Get().stop();
-          m_webDesktopMode = newDesktopMode;
-          emit webDesktopModeChanged();
-          emit webUrlChanged();
+        QTimer::singleShot(0,
+                           [this, newDesktopMode]
+                           {
+                             PlayerComponent::Get().stop();
+                             m_webDesktopMode = newDesktopMode;
+                             emit webDesktopModeChanged();
+                             emit webUrlChanged();
 
-          if (m_webDesktopMode)
-            SystemComponent::Get().setCursorVisibility(true);
-        });
+                             if (m_webDesktopMode)
+                               SystemComponent::Get().setCursorVisibility(true);
+                           });
       }
     }
   }
@@ -434,7 +438,8 @@ void KonvergoWindow::updateMainSectionSettings(const QVariantMap& values)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void KonvergoWindow::updateForcedScreen()
 {
-  QString screenName = SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceFSScreen").toString();
+  QString screenName =
+  SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceFSScreen").toString();
 
   if (screenName.isEmpty())
     return;
@@ -456,7 +461,9 @@ void KonvergoWindow::updateForcedScreen()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void KonvergoWindow::updateWindowState(bool saveGeo)
 {
-  if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "fullscreen").toBool() || SystemComponent::Get().isOpenELEC() || SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceAlwaysFS").toBool())
+  if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "fullscreen").toBool() ||
+      SystemComponent::Get().isOpenELEC() ||
+      SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceAlwaysFS").toBool())
   {
     // if we were go from windowed to fullscreen
     // we want to store our current windowed position
@@ -467,10 +474,7 @@ void KonvergoWindow::updateWindowState(bool saveGeo)
 
     // When fullscreening explicitly, we might have to move the window to a
     // different screen, as Qt will fullscreen to the current screen.
-    QTimer::singleShot(200, [=]
-    {
-      updateForcedScreen();
-    });
+    QTimer::singleShot(200, [=] { updateForcedScreen(); });
   }
   else
   {
@@ -485,7 +489,7 @@ void KonvergoWindow::updateWindowState(bool saveGeo)
     if (SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "alwaysOnTop").toBool())
       setFlags(flags() | forceOnTopFlags);
     else
-      setFlags(flags() &~ forceOnTopFlags);
+      setFlags(flags() & ~forceOnTopFlags);
   }
 
   InputComponent::Get().cancelAutoRepeat();
@@ -497,9 +501,9 @@ QScreen* KonvergoWindow::findCurrentScreen()
   // Return the screen that contains most of the window. Quite possible that
   // screen() would be sufficient, at least once the Qt bug returning a wrong
   // QScreen on Windows is fixed.
-  QScreen *best = nullptr;
+  QScreen* best = nullptr;
   qint64 bestArea = 0;
-  for(QScreen* screen : qApp->screens())
+  for (QScreen* screen : qApp->screens())
   {
     QRect areaRC = screen->geometry().intersected(geometry());
     qint64 area = areaRC.width() * (qint64)areaRC.height();
@@ -531,7 +535,8 @@ void KonvergoWindow::onVisibilityChanged(QWindow::Visibility visibility)
   }
 #endif
 
-  if (visibility == QWindow::Windowed && SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceAlwaysFS").toBool())
+  if (visibility == QWindow::Windowed &&
+      SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceAlwaysFS").toBool())
   {
     QLOG_WARN() << "Forcing re-entering fullscreen because of forceAlwaysFS setting!";
     updateForcedScreen(); // if a specific screen is forced, try to move the window there
@@ -554,12 +559,13 @@ void KonvergoWindow::onVisibilityChanged(QWindow::Visibility visibility)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void KonvergoWindow::focusOutEvent(QFocusEvent * ev)
+void KonvergoWindow::focusOutEvent(QFocusEvent* ev)
 {
 #ifdef Q_OS_WIN32
   // Do this to workaround DWM compositor bugs with fullscreened OpenGL applications.
   // The compositor will not properly redraw anything when focusing other windows.
-  if (visibility() == QWindow::FullScreen && SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "minimizeOnDefocus").toBool())
+  if (visibility() == QWindow::FullScreen &&
+      SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "minimizeOnDefocus").toBool())
   {
     QLOG_DEBUG() << "minimizing window";
     showMinimized();
@@ -600,10 +606,13 @@ void KonvergoWindow::updateDebugInfo()
   MONITORINFO moninfo = {};
   moninfo.cbSize = sizeof(moninfo);
   RECT winrc;
-  if (GetMonitorInfo(mon, &moninfo) &&GetWindowRect((HWND)winId(), &winrc))
+  if (GetMonitorInfo(mon, &moninfo) && GetWindowRect((HWND)winId(), &winrc))
   {
     RECT rc = moninfo.rcMonitor;
-    info << "  Win32 window" << QString("%1/%2 %3x%4").arg(rc.left).arg(rc.top).arg(rc.right).arg(rc.bottom) << QString("%1/%2 %3x%4").arg(winrc.left).arg(winrc.top).arg(winrc.right).arg(winrc.bottom) << "\n";
+    info << "  Win32 window"
+         << QString("%1/%2 %3x%4").arg(rc.left).arg(rc.top).arg(rc.right).arg(rc.bottom)
+         << QString("%1/%2 %3x%4").arg(winrc.left).arg(winrc.top).arg(winrc.right).arg(winrc.bottom)
+         << "\n";
   }
 #endif
 
@@ -634,13 +643,13 @@ void KonvergoWindow::resizeEvent(QResizeEvent* event)
 {
   QLOG_DEBUG() << "resize event:" << event->size();
 
-  // This next block was added at some point to workaround a problem with
-  // resizing on windows. Unfortunately it broke the desktop client behavior
-  // and when retried on Windows 10 with Qt5.7 the original bug seems to be
-  // gone. I'll keep this code around until such a time that we dont get any
-  // complaints about it.
-  //
-  #if 0
+// This next block was added at some point to workaround a problem with
+// resizing on windows. Unfortunately it broke the desktop client behavior
+// and when retried on Windows 10 with Qt6.7 the original bug seems to be
+// gone. I'll keep this code around until such a time that we dont get any
+// complaints about it.
+//
+#if 0
   // This next block should never really be needed in a prefect world...
   // Unfortunatly this is an imperfect world and on windows sometimes what
   // would happen on startup is that we got a resize event that would make
@@ -656,7 +665,7 @@ void KonvergoWindow::resizeEvent(QResizeEvent* event)
       return;
     }
   }
-  #endif
+#endif
 
   QQuickWindow::resizeEvent(event);
 }
@@ -664,9 +673,11 @@ void KonvergoWindow::resizeEvent(QResizeEvent* event)
 /////////////////////////////////////////////////////////////////////////////////////////
 QScreen* KonvergoWindow::loadLastScreen()
 {
-  QString screenName = SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceFSScreen").toString();
+  QString screenName =
+  SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceFSScreen").toString();
   if (screenName.isEmpty())
-    screenName = SettingsComponent::Get().value(SETTINGS_SECTION_STATE, "lastUsedScreen").toString();
+    screenName =
+    SettingsComponent::Get().value(SETTINGS_SECTION_STATE, "lastUsedScreen").toString();
   if (screenName.isEmpty())
     return nullptr;
 
@@ -691,7 +702,8 @@ QString KonvergoWindow::webUrl()
 void KonvergoWindow::updateScreens()
 {
   QScreen* windowScreen = findCurrentScreen();
-  QString screenName = SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceFSScreen").toString();
+  QString screenName =
+  SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "forceFSScreen").toString();
 
   QVariantList settingList;
 
@@ -703,7 +715,7 @@ void KonvergoWindow::updateScreens()
 
   bool currentPresent = false;
   int num = 0;
-  for(QScreen* screen : qApp->screens())
+  for (QScreen* screen : qApp->screens())
   {
     QRect rc = screen->geometry();
     bool active = screen == windowScreen;
@@ -711,9 +723,8 @@ void KonvergoWindow::updateScreens()
     QVariantMap entry;
     entry["value"] = screen->name();
     entry["title"] =
-      QString("%1,%2 %3x%4").arg(rc.left()).arg(rc.top()).arg(rc.right()).arg(rc.bottom()) +
-      " (" + screen->name() + ")" +
-      (active ? " *" : "");
+    QString("%1,%2 %3x%4").arg(rc.left()).arg(rc.top()).arg(rc.right()).arg(rc.bottom()) + " (" +
+    screen->name() + ")" + (active ? " *" : "");
 
     settingList << entry;
 
@@ -721,9 +732,8 @@ void KonvergoWindow::updateScreens()
     if (selected)
       currentPresent = true;
 
-    QLOG_DEBUG() << "Screen" << (num++) << screen << screen->geometry()
-                 << screen->virtualGeometry() << "active:" << active
-                 << "selected:" << selected;
+    QLOG_DEBUG() << "Screen" << (num++) << screen << screen->geometry() << screen->virtualGeometry()
+                 << "active:" << active << "selected:" << selected;
   }
 
   if (!currentPresent && !screenName.isEmpty())
@@ -735,27 +745,22 @@ void KonvergoWindow::updateScreens()
     settingList << entry;
   }
 
-  SettingsComponent::Get().updatePossibleValues(SETTINGS_SECTION_MAIN, "forceFSScreen", settingList);
+  SettingsComponent::Get().updatePossibleValues(SETTINGS_SECTION_MAIN, "forceFSScreen",
+                                                settingList);
 
   m_currentScreenName = windowScreen ? windowScreen->name() : "";
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void KonvergoWindow::onScreenAdded(QScreen *screen)
+void KonvergoWindow::onScreenAdded(QScreen* screen)
 {
   updateScreens();
   // The timer is out of fear for chaotic mid-change states.
-  QTimer::singleShot(200, [this]
-  {
-    updateForcedScreen();
-  });
+  QTimer::singleShot(200, [this] { updateForcedScreen(); });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void KonvergoWindow::onScreenRemoved(QScreen *screen)
-{
-  updateScreens();
-}
+void KonvergoWindow::onScreenRemoved(QScreen* screen) { updateScreens(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void KonvergoWindow::updateCurrentScreen()

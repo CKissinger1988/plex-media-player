@@ -1,14 +1,13 @@
 #ifndef POWERMANAGER
 #define POWERMANAGER
 
-#include <QsLog.h>
 #include "ComponentManager.h"
+#include <QsLog.h>
 
 class PowerComponent : public ComponentBase
 {
   Q_OBJECT
 public:
-
   enum PowerCapabilities
   {
     CAP_POWER_OFF = 0x01,
@@ -19,9 +18,7 @@ public:
 
   static PowerComponent& Get();
 
-  explicit PowerComponent(QObject* parent = nullptr)
-  : ComponentBase(parent)
-    { }
+  explicit PowerComponent(QObject* parent = nullptr) : ComponentBase(parent) {}
 
   bool componentInitialize() override;
   bool componentExport() override { return true; }
@@ -37,9 +34,9 @@ public Q_SLOTS:
   bool canRelaunch()
   {
 #if OPENELEC
-      return true;
+    return true;
 #else
-      return false;
+    return false;
 #endif
   }
 
@@ -61,6 +58,4 @@ protected:
   virtual void doEnableScreensaver() {};
 };
 
-
 #endif // POWERMANAGER
-

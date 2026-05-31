@@ -5,8 +5,8 @@
 #ifndef KONVERGO_INPUTSOCKET_H
 #define KONVERGO_INPUTSOCKET_H
 
-#include "LocalJsonServer.h"
 #include "InputComponent.h"
+#include "LocalJsonServer.h"
 
 class InputSocket : public InputBase
 {
@@ -30,4 +30,4 @@ private:
   LocalJsonServer* m_server;
 };
 
-#endif //KONVERGO_INPUTSOCKET_H
+#endif // KONVERGO_INPUTSOCKET_H

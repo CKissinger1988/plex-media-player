@@ -1,2 +1,2 @@
 NEW:
-  - Inital release of Plex Media Player
+  - Inital release of SpartanAI-Media

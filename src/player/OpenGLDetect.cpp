@@ -1,14 +1,14 @@
-#include <QtGlobal>
-#include <QSurfaceFormat>
 #include <QCoreApplication>
 #include <QOpenGLContext>
+#include <QSurfaceFormat>
+#include <QtGlobal>
 
 #include <mpv/client.h>
 
 #include "QsLog.h"
 
-#include "QtHelper.h"
 #include "OpenGLDetect.h"
+#include "QtHelper.h"
 
 #if defined(Q_OS_MAC)
 
@@ -26,9 +26,7 @@ void detectOpenGLEarly()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void detectOpenGLLate()
-{
-}
+void detectOpenGLLate() {}
 
 #elif defined(Q_OS_LINUX)
 
@@ -63,17 +61,12 @@ void detectOpenGLEarly()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void detectOpenGLLate()
-{
-}
+void detectOpenGLLate() {}
 
 #elif defined(Q_OS_WIN)
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void detectOpenGLEarly()
-{
-}
+void detectOpenGLEarly() {}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void detectOpenGLLate()
@@ -107,13 +100,9 @@ void detectOpenGLLate()
 #else
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void detectOpenGLEarly()
-{
-}
+void detectOpenGLEarly() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void detectOpenGLLate()
-{
-}
+void detectOpenGLLate() {}
 
 #endif

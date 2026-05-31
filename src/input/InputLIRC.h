@@ -1,9 +1,9 @@
 #ifndef INPUTLIRC_H
 #define INPUTLIRC_H
 
+#include "input/InputComponent.h"
 #include <QLocalSocket>
 #include <QSocketNotifier>
-#include "input/InputComponent.h"
 
 class InputLIRC : public InputBase
 {

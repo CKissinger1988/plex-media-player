@@ -2,7 +2,7 @@
 // the standard one that you pick up for your appletv or old mac mini
 // and the old PHT style harmony remote. PHT had a interesting hack that
 // changed the device-id between keypresses to be able to emulate more
-// buttons than was physically on the remote. In PMP we emulate this mode
+// buttons than was physically on the remote. In SAM we emulate this mode
 // by sending the deviceID (XXX) first in the keycode like: XXX-Y
 //
 // The harmony sends out deviceId's between 150 and 160 for this mode so
@@ -57,7 +57,7 @@
     "158-1": "seek_backward",
     "158-2": "seek_forward"
 
-    // Keys that are mapped in the harmony but not used in PMP
+    // Keys that are mapped in the harmony but not used in SAM
     //"157-1": "aspect",
     //"154-5": "clear",
     //"157-6": "power toggle",

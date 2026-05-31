@@ -3,7 +3,6 @@
 
 #include "PowerComponent.h"
 
-
 class PowerComponentWin : public PowerComponent
 {
 public:
@@ -25,7 +24,6 @@ public:
 
 private:
   bool m_hasPrivileges;
-
 };
 
 #endif // POWERCOMPONENTWIN_H

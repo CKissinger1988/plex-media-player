@@ -2,15 +2,15 @@
 // Created by Tobias Hieta on 18/09/15.
 //
 
-#include <qstandardpaths.h>
 #include <qdir.h>
+#include <qstandardpaths.h>
 
 #include "HelperLaunchd.h"
 
+#include "HelperLauncher.h"
 #include "QsLog.h"
 #include "plistparser.h"
 #include "plistserializer.h"
-#include "HelperLauncher.h"
 
 #define LAUNCHCTL_PATH "/bin/launchctl"
 
@@ -19,20 +19,23 @@ HelperLaunchd::HelperLaunchd(QObject* parent) : QObject(parent)
 {
   m_launchctl = new QProcess(this);
 
-  connect(m_launchctl, static_cast<void (QProcess::*)(QProcess::ProcessError)>(&QProcess::error), [=](QProcess::ProcessError error){
-    QLOG_ERROR() << "When trying to execute launchctl:" << m_launchctl->errorString();
-  });
+  connect(m_launchctl, static_cast<void (QProcess::*)(QProcess::ProcessError)>(&QProcess::error),
+          [=](QProcess::ProcessError error)
+          { QLOG_ERROR() << "When trying to execute launchctl:" << m_launchctl->errorString(); });
 
-  connect(m_launchctl, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus status){
-    if (status == QProcess::NormalExit)
-    {
-      QLOG_INFO() << "Ran launchctl successfully";
-    }
-    else
-    {
-      QLOG_ERROR() << "Failed to run launchctl:" << m_launchctl->errorString();
-    }
-  });
+  connect(m_launchctl,
+          static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+          [=](int exitCode, QProcess::ExitStatus status)
+          {
+            if (status == QProcess::NormalExit)
+            {
+              QLOG_INFO() << "Ran launchctl successfully";
+            }
+            else
+            {
+              QLOG_ERROR() << "Failed to run launchctl:" << m_launchctl->errorString();
+            }
+          });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +145,4 @@ void HelperLaunchd::start()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void HelperLaunchd::stop()
-{
-  unloadHelper();
-}
+void HelperLaunchd::stop() { unloadHelper(); }

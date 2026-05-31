@@ -4,17 +4,17 @@
 
 #include "ComponentManager.h"
 
-#include "power/PowerComponent.h"
-#include "server/HTTPServer.h"
+#include "ai/AIComponent.h"
+#include "ai/MediaScraper.h"
+#include "display/DisplayComponent.h"
 #include "input/InputComponent.h"
 #include "player/PlayerComponent.h"
-#include "display/DisplayComponent.h"
+#include "power/PowerComponent.h"
+#include "remote/RemoteComponent.h"
+#include "server/HTTPServer.h"
+#include "settings/SettingsComponent.h"
 #include "system/SystemComponent.h"
 #include "system/UpdaterComponent.h"
-#include "settings/SettingsComponent.h"
-#include "remote/RemoteComponent.h"
-
-#include "server/HTTPServer.h"
 
 #if KONVERGO_OPENELEC
 #include "system/openelec/OESystemComponent.h"
@@ -22,27 +22,30 @@
 
 #include "QsLog.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-ComponentManager::ComponentManager() : QObject(nullptr)
-{
-}
+// Custom deleter that does nothing for static singletons
+struct NoDeleter {
+    void operator()(ComponentBase*) const {}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void ComponentManager::registerComponent(ComponentBase* comp)
+ComponentManager::ComponentManager() : QObject(nullptr) {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void ComponentManager::registerComponent(std::shared_ptr<ComponentBase> comp)
 {
   if (m_components.contains(comp->componentName()))
   {
     QLOG_ERROR() << "Component" << comp->componentName() << "already registered!";
     return;
   }
-  
+
   if (comp->componentInitialize())
   {
     QLOG_INFO() << "Component:" << comp->componentName() << "inited";
     m_components[comp->componentName()] = comp;
 
     // define component as property for qml
-    m_qmlProperyMap.insert(comp->componentName(), QVariant::fromValue(comp));
+    m_qmlProperyMap.insert(comp->componentName(), QVariant::fromValue(comp.get()));
   }
   else
   {
@@ -56,37 +59,39 @@ void ComponentManager::initialize()
   // then settings, since all other components
   // might have some settings
   //
-  registerComponent(&SettingsComponent::Get());
+  registerComponent(std::shared_ptr<ComponentBase>(&SettingsComponent::Get(), NoDeleter()));
 
   // start our web server
-  auto server = new HttpServer(this);
-  server->start();
+  m_server = std::make_unique<HttpServer>(this);
+  m_server->start();
 
-  registerComponent(&InputComponent::Get());
-  registerComponent(&SystemComponent::Get());
-  registerComponent(&DisplayComponent::Get());
-  registerComponent(&UpdaterComponent::Get());
-  registerComponent(&RemoteComponent::Get());
-  registerComponent(&PlayerComponent::Get());
-  registerComponent(&PowerComponent::Get());
+  registerComponent(std::shared_ptr<ComponentBase>(&InputComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&SystemComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&DisplayComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&UpdaterComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&RemoteComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&PlayerComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&PowerComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&AIComponent::Get(), NoDeleter()));
+  registerComponent(std::shared_ptr<ComponentBase>(&MediaScraper::Get(), NoDeleter()));
 
 #if KONVERGO_OPENELEC
-  registerComponent(&OESystemComponent::Get());
+  registerComponent(std::shared_ptr<ComponentBase>(&OESystemComponent::Get(), NoDeleter()));
 #endif
 
-  for(ComponentBase* component : m_components.values())
+  for (auto component : m_components.values())
     component->componentPostInitialize();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void ComponentManager::setWebChannel(QWebChannel* webChannel)
 {
-  for(ComponentBase* comp : m_components.values())
+  for (auto comp : m_components.values())
   {
     if (comp->componentExport())
     {
       QLOG_DEBUG() << "Adding component:" << comp->componentName() << "to webchannel";
-      webChannel->registerObject(comp->componentName(), comp);
+      webChannel->registerObject(comp->componentName(), comp.get());
     }
   }
 }

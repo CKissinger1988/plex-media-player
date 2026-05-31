@@ -2,14 +2,14 @@
 // Created by Tobias Hieta on 26/08/15.
 //
 
+#include "HelperSocket.h"
+#include "Names.h"
+#include "QsLog.h"
+#include "UniqueApplication.h"
+#include "Version.h"
+#include "utils/Utils.h"
 #include <QCoreApplication>
 #include <UniqueApplication.h>
-#include "QsLog.h"
-#include "utils/Utils.h"
-#include "Version.h"
-#include "HelperSocket.h"
-#include "UniqueApplication.h"
-#include "Names.h"
 
 #ifdef ENABLE_CRASHDUMP
 #include "CrashUploader.h"
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   QCoreApplication::setApplicationVersion(Version::GetVersionString());
   QCoreApplication::setOrganizationDomain("plex.tv");
 
-  UniqueApplication uapp(nullptr, "pmpHelperUniqueApplication");
+  UniqueApplication uapp(nullptr, "samHelperUniqueApplication");
   if (!uapp.ensureUnique())
   {
     fprintf(stderr, "Other helper already running, refusing to start.\n");
@@ -36,10 +36,7 @@ int main(int argc, char** argv)
 
   // init logging.
   DestinationPtr dest = DestinationFactory::MakeFileDestination(
-    Paths::logDir("pmphelper.log"),
-    EnableLogRotation,
-    MaxSizeBytes(1024 * 1024),
-    MaxOldLogCount(2));
+  Paths::logDir("samhelper.log"), EnableLogRotation, MaxSizeBytes(1024 * 1024), MaxOldLogCount(2));
 
   // make sure we get a fresh log
   dest->rotate();

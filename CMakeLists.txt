@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR)
 
 # use a toolchain file if any for Embedded
 if (EXISTS "${CMAKE_SOURCE_DIR}/toolchain.cmake")
   set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 endif()
 
-project(PlexMediaPlayer CXX C)
+project(SpartanAIMedia CXX C)
 
 # we want this to be able to run clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
@@ -28,7 +28,7 @@ if(BUILD_TARGET STREQUAL "RPI")
   Message(STATUS "Build for Raspberry PI target")
 endif(BUILD_TARGET STREQUAL "RPI")
 
-option(ENABLE_HELPER "Enable PMP Helper" ON)
+option(ENABLE_HELPER "Enable SAM Helper" ON)
 if (ENABLE_HELPER)
   add_definitions(-DENABLE_HELPER=1)
 endif(ENABLE_HELPER)
@@ -71,13 +71,13 @@ elseif(UNIX AND (NOT APPLE))
   include(LinuxConfiguration)
 endif(APPLE)
 
-if (Qt5_POSITION_INDEPENDENT_CODE)
+if (Qt6_POSITION_INDEPENDENT_CODE)
   SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif(Qt5_POSITION_INDEPENDENT_CODE)
+endif(Qt6_POSITION_INDEPENDENT_CODE)
 
 add_subdirectory(external)
 add_subdirectory(src)
 
 include(CPackConfiguration)
 
-add_custom_target(install_app_bundle COMMAND ${CMAKE_COMMAND} -P cmake_install.cmake DEPENDS PlexMediaPlayer PMPHelper)
+add_custom_target(install_app_bundle COMMAND ${CMAKE_COMMAND} -P cmake_install.cmake DEPENDS SpartanAIMedia SAMHelper)

@@ -18,11 +18,11 @@ void PowerComponentX11::onTimer()
   {
     m_process = new QProcess(this);
     m_process->setProcessChannelMode(QProcess::ForwardedChannels);
-    connect(m_process, (void (QProcess::*)(int,QProcess::ExitStatus))&QProcess::finished,
-            this, &PowerComponentX11::onProcessFinished);
-    connect(m_process, (void (QProcess::*)(QProcess::ProcessError))&QProcess::error,
-            this, &PowerComponentX11::onProcessError);
-    m_process->start("xdg-screensaver", {"reset"});
+    connect(m_process, (void (QProcess::*)(int, QProcess::ExitStatus))&QProcess::finished, this,
+            &PowerComponentX11::onProcessFinished);
+    connect(m_process, (void (QProcess::*)(QProcess::ProcessError))&QProcess::error, this,
+            &PowerComponentX11::onProcessError);
+    m_process->start("xdg-screensaver", { "reset" });
   }
 }
 
@@ -43,13 +43,7 @@ void PowerComponentX11::onProcessError(QProcess::ProcessError error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void PowerComponentX11::doDisableScreensaver()
-{
-  m_timer->start();
-}
+void PowerComponentX11::doDisableScreensaver() { m_timer->start(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void PowerComponentX11::doEnableScreensaver()
-{
-  m_timer->stop();
-}
+void PowerComponentX11::doEnableScreensaver() { m_timer->stop(); }

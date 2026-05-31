@@ -5,11 +5,11 @@
 
 class PowerComponentDBus : public PowerComponent
 {
-  public:
-    PowerComponentDBus() : PowerComponent(0) {};
-    ~PowerComponentDBus() {};
+public:
+  PowerComponentDBus() : PowerComponent(0) {};
+  ~PowerComponentDBus() {};
 
-  public Q_SLOTS:
+public Q_SLOTS:
 
   virtual int getPowerCapabilities() override
   {
@@ -23,19 +23,19 @@ class PowerComponentDBus : public PowerComponent
     return flags;
   }
 
-    virtual bool PowerOff();
-    virtual bool Reboot();
-    virtual bool Suspend() { return callPowerMethod("Suspend"); }
+  virtual bool PowerOff();
+  virtual bool Reboot();
+  virtual bool Suspend() { return callPowerMethod("Suspend"); }
 
-  private:
-    bool callPowerMethod(QString method);
-    bool isPowerMethodAvailable(QString method);
+private:
+  bool callPowerMethod(QString method);
+  bool isPowerMethodAvailable(QString method);
 
-    unsigned int screensaver_inhibit_cookie = 0;
-  
-  protected:
-    virtual void doDisableScreensaver();
-    virtual void doEnableScreensaver();
+  unsigned int screensaver_inhibit_cookie = 0;
+
+protected:
+  virtual void doDisableScreensaver();
+  virtual void doEnableScreensaver();
 };
 
 #endif // POWERCOMPONENTDBUS_H

@@ -1,13 +1,13 @@
 #include "HTTPServer.h"
 
-#include <QFile>
 #include <QCoreApplication>
+#include <QFile>
 
-#include "QsLog.h"
-#include "utils/Utils.h"
-#include "settings/SettingsComponent.h"
-#include "remote/RemoteComponent.h"
 #include "Paths.h"
+#include "QsLog.h"
+#include "remote/RemoteComponent.h"
+#include "settings/SettingsComponent.h"
+#include "utils/Utils.h"
 
 #define WEB_CLIENT_PATH "/web/tv"
 
@@ -25,7 +25,8 @@ bool HttpServer::start()
   connect(m_server, &QHttpServer::newRequest, this, &HttpServer::handleRequest);
   if (!m_server->listen(QHostAddress::AnyIPv4, m_port))
   {
-    QLOG_WARN() << "Failed to listen to remote control web server. Remote controlling from apps disabled.";
+    QLOG_WARN()
+    << "Failed to listen to remote control web server. Remote controlling from apps disabled.";
     return false;
   }
 
@@ -162,7 +163,8 @@ void HttpServer::handleSoundsRequest(QHttpRequest* request, QHttpResponse* respo
 /////////////////////////////////////////////////////////////////////////////////////////
 void HttpServer::handleRequest(QHttpRequest* request, QHttpResponse* response)
 {
-  QLOG_DEBUG() << "Incoming request to:" << request->url().toString() << "from" << request->remoteAddress();
+  QLOG_DEBUG() << "Incoming request to:" << request->url().toString() << "from"
+               << request->remoteAddress();
 
   QString path = request->url().path();
   if (path.startsWith(WEB_CLIENT_PATH))

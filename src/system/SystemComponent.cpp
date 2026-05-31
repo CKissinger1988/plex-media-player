@@ -1,30 +1,30 @@
-#include <QSysInfo>
-#include <QProcess>
-#include <QMap>
-#include <QtNetwork/qnetworkinterface.h>
-#include <QGuiApplication>
 #include <QDesktopServices>
 #include <QDir>
+#include <QGuiApplication>
+#include <QMap>
+#include <QProcess>
+#include <QSysInfo>
+#include <QtNetwork/qnetworkinterface.h>
 
-#include "input/InputComponent.h"
+#include "Names.h"
+#include "Paths.h"
+#include "QsLog.h"
 #include "SystemComponent.h"
 #include "Version.h"
-#include "QsLog.h"
+#include "input/InputComponent.h"
 #include "settings/SettingsComponent.h"
-#include "ui/KonvergoWindow.h"
 #include "settings/SettingsSection.h"
-#include "Paths.h"
-#include "Names.h"
+#include "ui/KonvergoWindow.h"
 #include "utils/Utils.h"
 
 #define MOUSE_TIMEOUT 5 * 1000
 
-#define KONVERGO_PRODUCTID_DEFAULT  3
+#define KONVERGO_PRODUCTID_DEFAULT 3
 #define KONVERGO_PRODUCTID_OPENELEC 4
 
 // Platform types map
-QMap<SystemComponent::PlatformType, QString> g_platformTypeNames = { \
-  { SystemComponent::platformTypeOsx, "macosx" }, \
+QMap<SystemComponent::PlatformType, QString> g_platformTypeNames = {
+  { SystemComponent::platformTypeOsx, "macosx" },
   { SystemComponent::platformTypeWindows, "windows" },
   { SystemComponent::platformTypeLinux, "linux" },
   { SystemComponent::platformTypeOpenELEC, "openelec" },
@@ -39,13 +39,18 @@ QMap<SystemComponent::PlatformArch, QString> g_platformArchNames = {
   { SystemComponent::platformArchUnknown, "unknown" }
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-SystemComponent::SystemComponent(QObject* parent) : ComponentBase(parent), m_platformType(platformTypeUnknown), m_platformArch(platformArchUnknown), m_doLogMessages(false), m_cursorVisible(true), m_scale(1)
+SystemComponent::SystemComponent(QObject* parent)
+  : ComponentBase(parent),
+    m_platformType(platformTypeUnknown),
+    m_platformArch(platformArchUnknown),
+    m_doLogMessages(false),
+    m_cursorVisible(true),
+    m_scale(1)
 {
   m_mouseOutTimer = new QTimer(this);
   m_mouseOutTimer->setSingleShot(true);
-  connect(m_mouseOutTimer, &QTimer::timeout, [&] () { setCursorVisibility(false); });
+  connect(m_mouseOutTimer, &QTimer::timeout, [&]() { setCursorVisibility(false); });
 
 // define OS Type
 #if defined(Q_OS_MAC)
@@ -67,10 +72,9 @@ SystemComponent::SystemComponent(QObject* parent) : ComponentBase(parent), m_pla
   m_platformArch = platformArchX86_64;
 #endif
 
-  connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_AUDIO), &SettingsSection::valuesUpdated, [=]()
-  {
-    emit capabilitiesChanged(getCapabilitiesString());
-  });
+  connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_AUDIO),
+          &SettingsSection::valuesUpdated,
+          [=]() { emit capabilitiesChanged(getCapabilitiesString()); });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -80,16 +84,14 @@ bool SystemComponent::componentInitialize()
   QDir().mkpath(Paths::dataDir("sounds"));
 
   // Hide mouse pointer on any keyboard input
-  connect(&InputComponent::Get(), &InputComponent::receivedInput, [=]() { setCursorVisibility(false); });
+  connect(&InputComponent::Get(), &InputComponent::receivedInput,
+          [=]() { setCursorVisibility(false); });
 
   return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void SystemComponent::crashApp()
-{
-  *(volatile int*)nullptr=0;
-}
+void SystemComponent::crashApp() { *(volatile int*)nullptr = 0; }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void SystemComponent::componentPostInitialize()
@@ -121,7 +123,7 @@ QVariantMap SystemComponent::systemInformation() const
   int productid = KONVERGO_PRODUCTID_DEFAULT;
 
 #ifdef Q_OS_WIN
-  arch = (sizeof(void *) == 8) ? "x86_64" : "i386";
+  arch = (sizeof(void*) == 8) ? "x86_64" : "i386";
 #else
   arch = QSysInfo::currentCpuArchitecture();
 #endif
@@ -143,27 +145,23 @@ QVariantMap SystemComponent::systemInformation() const
   }
 #endif
 
-  
   info["build"] = build + "-" + arch;
   info["dist"] = dist;
   info["version"] = Version::GetVersionString();
   info["productid"] = productid;
-  
- QLOG_DEBUG() << QString(
-                "System Information : build(%1)-arch(%2).dist(%3).version(%4).productid(%5)")
-                .arg(build)
-                .arg(arch)
-                .arg(dist)
-                .arg(Version::GetVersionString())
-                .arg(productid);
- return info;
+
+  QLOG_DEBUG() << QString(
+                  "System Information : build(%1)-arch(%2).dist(%3).version(%4).productid(%5)")
+                  .arg(build)
+                  .arg(arch)
+                  .arg(dist)
+                  .arg(Version::GetVersionString())
+                  .arg(productid);
+  return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void SystemComponent::exit()
-{
-  qApp->quit();
-}
+void SystemComponent::exit() { qApp->quit(); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void SystemComponent::restart()
@@ -212,7 +210,11 @@ void SystemComponent::setCursorVisibility(bool visible)
 QString SystemComponent::getUserAgent()
 {
   QString osVersion = QSysInfo::productVersion();
-  QString userAgent = QString("PlexMediaPlayer %1 (%2-%3 %4)").arg(Version::GetVersionString()).arg(getPlatformTypeString()).arg(getPlatformArchString()).arg(osVersion);
+  QString userAgent = QString("SpartanAIMedia %1 (%2-%3 %4)")
+                      .arg(Version::GetVersionString())
+                      .arg(getPlatformTypeString())
+                      .arg(getPlatformArchString())
+                      .arg(osVersion);
   return userAgent;
 }
 
@@ -222,13 +224,16 @@ QString SystemComponent::debugInformation()
   QString debugInfo;
   QTextStream stream(&debugInfo);
 
-  stream << "Plex Media Player" << endl;
-  stream << "  Version: " << Version::GetVersionString() << " built: " << Version::GetBuildDate() << endl;
+  stream << "SpartanAI-Media" << endl;
+  stream << "  Version: " << Version::GetVersionString() << " built: " << Version::GetBuildDate()
+         << endl;
   stream << "  Web Client Version: " << Version::GetWebVersion() << endl;
-  stream << "  Web Client URL: " << SettingsComponent::Get().value(SETTINGS_SECTION_PATH, "startupurl").toString() << endl;
+  stream << "  Web Client URL: "
+         << SettingsComponent::Get().value(SETTINGS_SECTION_PATH, "startupurl").toString() << endl;
   stream << "  Platform: " << getPlatformTypeString() << "-" << getPlatformArchString() << endl;
   stream << "  User-Agent: " << getUserAgent() << endl;
-  stream << "  Qt version: " << qVersion() << QString("(%1)").arg(Version::GetQtDepsVersion()) << endl;
+  stream << "  Qt version: " << qVersion() << QString("(%1)").arg(Version::GetQtDepsVersion())
+         << endl;
   stream << "  Depends version: " << Version::GetDependenciesVersion() << endl;
   stream << endl;
 
@@ -238,7 +243,7 @@ QString SystemComponent::debugInformation()
   stream << endl;
 
   stream << "Network Addresses" << endl;
-  for(const QString& addr : networkAddresses())
+  for (const QString& addr : networkAddresses())
   {
     stream << "  " << addr << endl;
   }
@@ -258,10 +263,10 @@ int SystemComponent::networkPort() const
 QStringList SystemComponent::networkAddresses() const
 {
   QStringList list;
-  for(const QHostAddress& address : QNetworkInterface::allAddresses())
+  for (const QHostAddress& address : QNetworkInterface::allAddresses())
   {
-    if (! address.isLoopback() && (address.protocol() == QAbstractSocket::IPv4Protocol ||
-                                   address.protocol() == QAbstractSocket::IPv6Protocol))
+    if (!address.isLoopback() && (address.protocol() == QAbstractSocket::IPv4Protocol ||
+                                  address.protocol() == QAbstractSocket::IPv6Protocol))
     {
       auto s = address.toString();
       if (!s.startsWith("fe80::"))
@@ -276,8 +281,8 @@ QStringList SystemComponent::networkAddresses() const
 void SystemComponent::userInformation(const QVariantMap& userModel)
 {
   QStringList roleList;
-  for(const QVariant& role : userModel.value("roles").toList())
-  { 
+  for (const QVariant& role : userModel.value("roles").toList())
+  {
     roleList << role.toMap().value("id").toString();
   }
 
@@ -288,10 +293,7 @@ void SystemComponent::userInformation(const QVariantMap& userModel)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void SystemComponent::openExternalUrl(const QString& url)
-{
-  QDesktopServices::openUrl(QUrl(url));
-}
+void SystemComponent::openExternalUrl(const QString& url) { QDesktopServices::openUrl(QUrl(url)); }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void SystemComponent::runUserScript(QString script)
@@ -335,15 +337,19 @@ void SystemComponent::hello(const QString& version)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-#define BASESTR "protocols=shoutcast,http-video;videoDecoders=h264{profile:high&resolution:2160&level:52};audioDecoders=mp3,aac,dts{bitrate:800000&channels:%1},ac3{bitrate:800000&channels:%2}"
+#define BASESTR                                                                                    \
+  "protocols=shoutcast,http-video;videoDecoders=h264{profile:high&resolution:2160&level:52};"      \
+  "audioDecoders=mp3,aac,dts{bitrate:800000&channels:%1},ac3{bitrate:800000&channels:%2}"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 QString SystemComponent::getCapabilitiesString()
 {
   auto capstring = QString(BASESTR);
   auto channels = SettingsComponent::Get().value(SETTINGS_SECTION_AUDIO, "channels").toString();
-  auto dtsenabled = SettingsComponent::Get().value(SETTINGS_SECTION_AUDIO, "passthrough.dts").toBool();
-  auto ac3enabled = SettingsComponent::Get().value(SETTINGS_SECTION_AUDIO, "passthrough.ac3").toBool();
+  auto dtsenabled =
+  SettingsComponent::Get().value(SETTINGS_SECTION_AUDIO, "passthrough.dts").toBool();
+  auto ac3enabled =
+  SettingsComponent::Get().value(SETTINGS_SECTION_AUDIO, "passthrough.ac3").toBool();
 
   // Assume that auto means that we want to select multi-channel tracks by default.
   // So really only disable it when 2.0 is selected.

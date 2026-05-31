@@ -1,1 +1,1 @@
-start "" "PlexMediaPlayer.exe" "--disable-gpu"
+start "" "SpartanAIMedia.exe" "--disable-gpu"

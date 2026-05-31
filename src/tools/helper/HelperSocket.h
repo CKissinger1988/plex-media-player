@@ -5,8 +5,8 @@
 #ifndef KONVERGO_HELPERSOCKET_H
 #define KONVERGO_HELPERSOCKET_H
 
-#include "Paths.h"
 #include "LocalJsonServer.h"
+#include "Paths.h"
 
 #include <QTimer>
 
@@ -23,4 +23,4 @@ private:
   QTimer* m_quitTimer;
 };
 
-#endif //KONVERGO_HELPERSOCKET_H
+#endif // KONVERGO_HELPERSOCKET_H

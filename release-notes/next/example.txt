@@ -1,6 +1,6 @@
 Type: Feature | Fix | Refactor
 Public: Yes | No
-GHI: https://github.com/plexinc/plex-media-player/issues/0000
+GHI: https://github.com/plexinc/spartanai-media/issues/0000
 Release Notes: Fixed the thing | Added the thing
 
 Glossary:

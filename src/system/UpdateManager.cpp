@@ -1,13 +1,13 @@
 #include "QsLog.h"
 
-#include <QDir>
-#include <QStandardPaths>
-#include <QCoreApplication>
-#include <QProcess>
 #include "UpdateManager.h"
-#include "utils/Utils.h"
-#include "utils/HelperLauncher.h"
 #include "system/SystemComponent.h"
+#include "utils/HelperLauncher.h"
+#include "utils/Utils.h"
+#include <QCoreApplication>
+#include <QDir>
+#include <QProcess>
+#include <QStandardPaths>
 
 #ifdef KONVERGO_OPENELEC
 #include "OEUpdateManager.h"
@@ -50,7 +50,7 @@ QString UpdateManager::HaveUpdate()
   // sort update directories, sort by the newest directory first, that way
   // we apply the latest update downloaded.
   //
-  for(const QString& dir : updateDir.entryList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Time))
+  for (const QString& dir : updateDir.entryList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Time))
   {
     // check if this version has been applied
     QString readyFile(GetPath("_readyToApply", dir, false));
@@ -131,7 +131,8 @@ bool UpdateManager::applyUpdate(const QString& version)
   args << "--auto-close";
 
 #ifdef Q_OS_MAC
-  args << "--install-dir=" + QDir(QCoreApplication::applicationDirPath() + "/../../").absolutePath();
+  args << "--install-dir=" +
+          QDir(QCoreApplication::applicationDirPath() + "/../../").absolutePath();
 #else
   args << "--install-dir=" + QDir(QCoreApplication::applicationDirPath()).absolutePath();
 #endif
@@ -142,10 +143,10 @@ bool UpdateManager::applyUpdate(const QString& version)
   QFile::remove(GetPath("_readyToApply", version, false));
 
   QLOG_DEBUG() << "Executing:" << updaterPath << args;
-  auto  process = new QProcess(nullptr);
+  auto process = new QProcess(nullptr);
   if (process->startDetached(updaterPath, args, QDir::temp().absolutePath()))
   {
-    QLOG_DEBUG() << "Updater running, shutting down Plex Media Player";
+    QLOG_DEBUG() << "Updater running, shutting down SpartanAI-Media";
 
     return true;
   }
@@ -163,7 +164,8 @@ QString UpdateManager::GetPath(const QString& file, const QString& version, bool
   if (package)
     filePath = "packages/" + file;
 
-  return QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/updates/" + version + "/" + filePath;
+  return QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/updates/" + version +
+         "/" + filePath;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

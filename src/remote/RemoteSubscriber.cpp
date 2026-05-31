@@ -2,19 +2,23 @@
 // Created by Tobias Hieta on 31/03/15.
 //
 
+#include <QDomDocument>
+#include <QMutex>
 #include <QNetworkAccessManager>
 #include <QsLog.h>
 #include <QtCore/qxmlstream.h>
-#include <QDomDocument>
-#include <QMutex>
 
-#include "RemoteSubscriber.h"
 #include "RemoteComponent.h"
+#include "RemoteSubscriber.h"
 #include "settings/SettingsComponent.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
-RemoteSubscriber::RemoteSubscriber(const QString& clientIdentifier, const QString& deviceName, const QUrl& address, QObject* parent)
-  : QObject(parent), m_address(address), m_clientIdentifier(clientIdentifier), m_deviceName(deviceName)
+RemoteSubscriber::RemoteSubscriber(const QString& clientIdentifier, const QString& deviceName,
+                                   const QUrl& address, QObject* parent)
+  : QObject(parent),
+    m_address(address),
+    m_clientIdentifier(clientIdentifier),
+    m_deviceName(deviceName)
 {
   m_subscribeTime.start();
 
@@ -34,22 +38,13 @@ RemoteSubscriber::RemoteSubscriber(const QString& clientIdentifier, const QStrin
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void RemoteSubscriber::reSubscribe()
-{
-  m_subscribeTime.restart();
-}
+void RemoteSubscriber::reSubscribe() { m_subscribeTime.restart(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-QString RemoteSubscriber::deviceName()
-{
-  return m_deviceName;
-}
+QString RemoteSubscriber::deviceName() { return m_deviceName; }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-QString RemoteSubscriber::clientIdentifier()
-{
-  return m_clientIdentifier;
-}
+QString RemoteSubscriber::clientIdentifier() { return m_clientIdentifier; }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void RemoteSubscriber::sendUpdate()
@@ -62,7 +57,7 @@ void RemoteSubscriber::sendUpdate()
   request.setAttribute(QNetworkRequest::User, m_clientIdentifier);
 
   QVariantMap headers = RemoteComponent::HeaderInformation();
-  for(const QString& key : headers.keys())
+  for (const QString& key : headers.keys())
   {
     request.setRawHeader(key.toUtf8(), headers[key].toString().toUtf8());
   }
@@ -167,14 +162,15 @@ void RemoteSubscriber::setCommandId(quint64 playerCommandId, quint64 controllerC
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-RemotePollSubscriber::RemotePollSubscriber(const QString &clientIdentifier, const QString &deviceName, QHttpResponse *response, QObject *parent) :
-  RemoteSubscriber(clientIdentifier, deviceName, QUrl(""), parent), m_response(response)
+RemotePollSubscriber::RemotePollSubscriber(const QString& clientIdentifier,
+                                           const QString& deviceName, QHttpResponse* response,
+                                           QObject* parent)
+  : RemoteSubscriber(clientIdentifier, deviceName, QUrl(""), parent), m_response(response)
 {
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void RemotePollSubscriber::setHTTPResponse(QHttpResponse *response)
+void RemotePollSubscriber::setHTTPResponse(QHttpResponse* response)
 {
   m_response = response;
   m_response->addHeader("Content-Type", "application/xml");
@@ -198,7 +194,4 @@ void RemotePollSubscriber::sendUpdate()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void RemotePollSubscriber::responseDone()
-{
-  m_response = nullptr;
-}
+void RemotePollSubscriber::responseDone() { m_response = nullptr; }

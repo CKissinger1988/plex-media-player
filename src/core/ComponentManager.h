@@ -1,25 +1,27 @@
 #ifndef __COMPONENT_MANAGER_H__
 #define __COMPONENT_MANAGER_H__
 
-#include <QObject>
 #include <QMap>
+#include <QObject>
 #include <QQmlContext>
 #include <QQmlPropertyMap>
 #include <QWebChannel>
+#include <memory>
 
 #include "utils/Utils.h"
+#include "server/HTTPServer.h"
 
 class ComponentBase : public QObject
 {
 public:
-  explicit ComponentBase(QObject* parent = nullptr) : QObject(parent) { }
-  
+  explicit ComponentBase(QObject* parent = nullptr) : QObject(parent) {}
+
   virtual bool componentInitialize() = 0;
   virtual const char* componentName() = 0;
   virtual bool componentExport() = 0;
 
   // executed after ALL components are initialized
-  virtual void componentPostInitialize() { }
+  virtual void componentPostInitialize() {}
 };
 
 class ComponentManager : public QObject
@@ -29,15 +31,16 @@ class ComponentManager : public QObject
 
 public:
   void initialize();
-  inline QQmlPropertyMap &getQmlPropertyMap() { return m_qmlProperyMap; }
+  inline QQmlPropertyMap& getQmlPropertyMap() { return m_qmlProperyMap; }
   void setWebChannel(QWebChannel* webChannel);
 
 private:
   ComponentManager();
-  void registerComponent(ComponentBase* comp);
+  void registerComponent(std::shared_ptr<ComponentBase> comp);
 
-  QMap<QString, ComponentBase*> m_components;
+  QMap<QString, std::shared_ptr<ComponentBase>> m_components;
   QQmlPropertyMap m_qmlProperyMap;
+  std::unique_ptr<HttpServer> m_server;
 };
 
 #endif

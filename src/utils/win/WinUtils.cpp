@@ -12,7 +12,7 @@ bool WinUtils::getPowerManagementPrivileges()
     TOKEN_PRIVILEGES tkp = {};
     if (LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid))
     {
-      tkp.PrivilegeCount = 1;  // one privilege to set
+      tkp.PrivilegeCount = 1; // one privilege to set
       tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
       // Get the shutdown privilege for this process.

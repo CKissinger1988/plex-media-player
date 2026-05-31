@@ -1,8 +1,8 @@
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
 add_executable(socket-client
   SocketClient.cpp
-  $<TARGET_OBJECTS:shared>
 )
+
+target_link_libraries(socket-client PRIVATE Qt6::Network Qt6::Core qslog shared)
+target_include_directories(socket-client PRIVATE ${PROJECT_SOURCE_DIR}/src)
 std_target_properties(socket-client)
-target_link_libraries(socket-client ${Qt5Network_LIBRARIES} ${Qt5Core_LIBRARIES} qslog)
+clang_tidy(socket-client)

@@ -13,7 +13,7 @@ NEW:
     hardware you need to select that in the hardware acceleration settings. In
     addition the hardware acceleration setting was reset for platforms, so you
     will need to re-enable it.
-  - [Source] PMP now requires a C++14 compatible compiler to build 
+  - [Source] SAM now requires a C++14 compatible compiler to build 
   
 FIXED:
   - Fixed a issue where the video rendering could be held up by activity on the

@@ -32,7 +32,8 @@ PowerComponent& PowerComponent::Get()
   static PowerComponentWin instance;
   return instance;
 #else
-  QLOG_WARN() << "Could not find a power component matching this platform. OS screensaver control disabled.";
+  QLOG_WARN()
+  << "Could not find a power component matching this platform. OS screensaver control disabled.";
 
   static PowerComponent instance;
   return instance;
@@ -40,10 +41,7 @@ PowerComponent& PowerComponent::Get()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-bool PowerComponent::componentInitialize()
-{
-  return true;
-}
+bool PowerComponent::componentInitialize() { return true; }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void PowerComponent::setScreensaverEnabled(bool enabled)
@@ -76,5 +74,3 @@ bool PowerComponent::checkCap(PowerCapabilities capability)
 
   return (getPowerCapabilities() & capability);
 }
-
-

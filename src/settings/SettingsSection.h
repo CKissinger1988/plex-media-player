@@ -1,12 +1,12 @@
 #ifndef SETTINGSSECTION_H
 #define SETTINGSSECTION_H
 
-#include <QObject>
-#include <QMap>
-#include <QVariant>
-#include "SettingsValue.h"
-#include "SettingsComponent.h"
 #include "QsLog.h"
+#include "SettingsComponent.h"
+#include "SettingsValue.h"
+#include <QMap>
+#include <QObject>
+#include <QVariant>
 
 class SettingsSection : public QObject
 {
@@ -35,10 +35,7 @@ public:
   bool isValueHidden(const QString& key) const { return m_values[key]->isHidden(); }
   int orderIndex() const { return m_orderIndex; }
 
-  void setHidden(bool hidden=true)
-  {
-    m_hidden = hidden;
-  }
+  void setHidden(bool hidden = true) { m_hidden = hidden; }
 
   void setValueHidden(const QString& value, bool hidden)
   {
@@ -47,10 +44,7 @@ public:
   }
 
   void setStorage(bool storage) { m_storage = storage; }
-  bool isStorage() const
-  {
-    return m_storage;
-  }
+  bool isStorage() const { return m_storage; }
 
   Q_SIGNAL void valuesUpdated(const QVariantMap& values);
 

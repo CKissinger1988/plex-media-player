@@ -495,7 +495,7 @@
     "values": [
         {
           "value": "systemname",
-          "default": "PlexMediaPlayer",
+          "default": "SpartanAIMedia",
           "hidden": true,
           "platforms": [ "oe" ]
         },

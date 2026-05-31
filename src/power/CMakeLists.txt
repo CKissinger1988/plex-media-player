@@ -1,17 +1,23 @@
-add_sources(PowerComponent.h PowerComponent.cpp)
+add_library(power STATIC
+  PowerComponent.h PowerComponent.cpp
+)
 
 if(APPLE)
-  add_sources(PowerComponentMac.cpp PowerComponentMac.h)
-endif(APPLE)
+  target_sources(power PRIVATE PowerComponentMac.cpp PowerComponentMac.h)
+endif()
 
 if(LINUX_X11POWER)
-  add_sources(PowerComponentX11.cpp PowerComponentX11.h)
-endif(LINUX_X11POWER)
+  target_sources(power PRIVATE PowerComponentX11.cpp PowerComponentX11.h)
+endif()
 
 if(LINUX_DBUS)
-  add_sources(PowerComponentDBus.cpp PowerComponentDBus.h)
-endif(LINUX_DBUS)
+  target_sources(power PRIVATE PowerComponentDBus.cpp PowerComponentDBus.h)
+endif()
 
 if(WIN32)
-  add_sources(PowerComponentWin.cpp PowerComponentWin.h)
-endif(WIN32)
+  target_sources(power PRIVATE PowerComponentWin.cpp PowerComponentWin.h)
+endif()
+
+target_include_directories(power PUBLIC .)
+std_target_properties(power)
+clang_tidy(power)

@@ -1,8 +1,6 @@
-set(INPUT_SRCS
-  InputComponent.cpp
-  InputComponent.h
-  InputMapping.cpp
-  InputMapping.h
+add_library(input STATIC
+  InputComponent.cpp InputComponent.h
+  InputMapping.cpp InputMapping.h
   InputKeyboard.h
   InputSocket.h
   InputSocket.cpp
@@ -11,20 +9,22 @@ set(INPUT_SRCS
 )
 
 if(APPLE)
-  add_subdirectory(apple)
-endif(APPLE)
+  target_sources(input PRIVATE apple/InputApple.cpp apple/InputApple.h)
+endif()
 
 if(SDL2_FOUND)
-  list(APPEND INPUT_SRCS InputSDL.cpp InputSDL.h)
-endif(SDL2_FOUND)
+  target_sources(input PRIVATE InputSDL.cpp InputSDL.h)
+endif()
 
 if(ENABLE_LIRC)
-  list(APPEND INPUT_SRCS InputLIRC.cpp InputLIRC.h)
-endif(ENABLE_LIRC)
+  target_sources(input PRIVATE InputLIRC.cpp InputLIRC.h)
+endif()
 
 if(CEC_FOUND)
-  list(APPEND INPUT_SRCS InputCEC.cpp InputCEC.h)
-endif(CEC_FOUND)
+  target_sources(input PRIVATE InputCEC.cpp InputCEC.h)
+endif()
 
-add_sources(${INPUT_SRCS})
+target_include_directories(input PUBLIC .)
+std_target_properties(input)
+clang_tidy(input)
 

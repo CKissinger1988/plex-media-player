@@ -1,10 +1,10 @@
 #ifndef SETTINGSCOMPONENT_H
 #define SETTINGSCOMPONENT_H
 
-#include <QObject>
-#include "utils/Utils.h"
 #include "ComponentManager.h"
 #include "SettingsValue.h"
+#include "utils/Utils.h"
+#include <QObject>
 
 #define SETTINGS_SECTION_AUDIO "audio"
 #define SETTINGS_SECTION_VIDEO "video"
@@ -21,7 +21,6 @@
 #define AUDIO_DEVICE_TYPE_BASIC "basic"
 #define AUDIO_DEVICE_TYPE_SPDIF "spdif"
 #define AUDIO_DEVICE_TYPE_HDMI "hdmi"
-
 
 class SettingsSection;
 
@@ -63,7 +62,8 @@ public:
   Q_SLOT Q_INVOKABLE void cycleSettingCommand(const QString& args);
   Q_SLOT Q_INVOKABLE void setSettingCommand(const QString& args);
 
-  void updatePossibleValues(const QString& sectionID, const QString& key, const QVariantList& possibleValues);
+  void updatePossibleValues(const QString& sectionID, const QString& key,
+                            const QVariantList& possibleValues);
 
   void saveSettings();
   void saveStorage();
@@ -90,13 +90,10 @@ public:
   //
   static bool resetAndSaveOldConfiguration();
 
-  QString oldestPreviousVersion() const
-  {
-    return m_oldestPreviousVersion;
-  }
+  QString oldestPreviousVersion() const { return m_oldestPreviousVersion; }
 
 private:
-  explicit SettingsComponent(QObject *parent = nullptr);
+  explicit SettingsComponent(QObject* parent = nullptr);
   bool loadDescription();
   void parseSection(const QJsonObject& sectionObject);
   int platformMaskFromObject(const QJsonObject& object);

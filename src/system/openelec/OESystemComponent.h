@@ -11,7 +11,7 @@ class OESystemComponent : public ComponentBase
   DEFINE_SINGLETON(OESystemComponent)
 
 public:
-  OESystemComponent(QObject *parent = 0);
+  OESystemComponent(QObject* parent = 0);
 
   virtual bool componentExport() { return true; }
   virtual const char* componentName() { return "oesystem"; }

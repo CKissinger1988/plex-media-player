@@ -18,6 +18,6 @@ namespace Paths
   QString socketName(const QString& serverName);
   QString soundsPath(const QString& sound);
   QString webClientPath(const QString& mode = "tv");
-};
+}; // namespace Paths
 
-#endif //KONVERGO_PATHS_H
+#endif // KONVERGO_PATHS_H

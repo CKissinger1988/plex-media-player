@@ -2,10 +2,10 @@
 // Created by Tobias Hieta on 26/08/15.
 //
 
+#include "LocalJsonClient.h"
 #include <QCoreApplication>
 #include <QLocalSocket>
 #include <qqueue.h>
-#include "LocalJsonClient.h"
 
 class SocketClient : public QObject
 {
@@ -19,10 +19,7 @@ public:
     connect(m_socket, &LocalJsonClient::messageReceived, this, &SocketClient::gotMessage);
   }
 
-  void sendCommand(const QString& command)
-  {
-    m_commands.enqueue(command);
-  }
+  void sendCommand(const QString& command) { m_commands.enqueue(command); }
 
   Q_SLOT void gotMessage(const QVariantMap& message)
   {
@@ -62,11 +59,10 @@ int main(int argc, char** argv)
 
   SocketClient* client = new SocketClient();
 
-  for (int i = 1; i < argc; i ++)
+  for (int i = 1; i < argc; i++)
     client->sendCommand(QString::fromUtf8(argv[i]));
 
   return app.exec();
 }
-
 
 #include "SocketClient.moc"

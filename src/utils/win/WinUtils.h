@@ -1,7 +1,6 @@
 #ifndef WINUTILS_H
 #define WINUTILS_H
 
-
 namespace WinUtils
 {
   bool getPowerManagementPrivileges();

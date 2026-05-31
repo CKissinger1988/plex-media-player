@@ -7,7 +7,6 @@ class DisplayManagerDummy : public DisplayManager
 {
   Q_OBJECT
 private:
-
   void addMode(float rate);
 
   int m_currentMode;

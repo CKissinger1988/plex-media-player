@@ -1,5 +1,11 @@
-add_sources(PlayerComponent.cpp PlayerComponent.h)
-add_sources(PlayerQuickItem.cpp PlayerQuickItem.h)
-add_sources(CodecsComponent.cpp CodecsComponent.h)
-add_sources(OpenGLDetect.cpp OpenGLDetect.h)
-add_sources(QtHelper.h)
+add_library(player STATIC
+  PlayerComponent.cpp PlayerComponent.h
+  PlayerQuickItem.cpp PlayerQuickItem.h
+  CodecsComponent.cpp CodecsComponent.h
+  OpenGLDetect.cpp OpenGLDetect.h
+  QtHelper.h
+)
+
+std_target_properties(player)
+target_include_directories(player PUBLIC .)
+clang_tidy(player)

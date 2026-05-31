@@ -10,8 +10,8 @@
 #define _DISPLAYMANAGEROSX_H_
 
 #include "ApplicationServices/ApplicationServices.h"
-#include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFDictionary.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 #include "display/DisplayManager.h"
 
