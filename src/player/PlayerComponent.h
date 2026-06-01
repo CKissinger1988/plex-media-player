@@ -11,6 +11,9 @@
 
 #include <functional>
 
+#include "AudioDeviceManager.h"
+#include "CodecManager.h"
+#include "SubtitleManager.h"
 #include "CodecsComponent.h"
 #include "ComponentManager.h"
 #include "QtHelper.h"
@@ -243,6 +246,9 @@ private:
   QString m_currentSubtitleStream;
   QString m_currentAudioStream;
   QRect m_videoRectangle;
+  std::unique_ptr<AudioDeviceManager> m_audioManager;
+  std::unique_ptr<CodecManager> m_codecManager;
+  std::unique_ptr<SubtitleManager> m_subtitleManager;
 };
 
 #endif // PLAYERCOMPONENT_H

@@ -62,7 +62,10 @@ PlayerComponent::PlayerComponent(QObject* parent)
     m_reloadAudioTimer(this),
     m_streamSwitchImminent(false),
     m_doAc3Transcoding(false),
-    m_videoRectangle(-1, -1, -1, -1)
+    m_videoRectangle(-1, -1, -1, -1),
+    m_audioManager(std::make_unique<AudioDeviceManager>(m_mpv, this)),
+    m_codecManager(std::make_unique<CodecManager>(m_mpv, this)),
+    m_subtitleManager(std::make_unique<SubtitleManager>(m_mpv, this))
 {
   qmlRegisterType<PlayerQuickItem>("Konvergo", 1, 0, "MpvVideo"); // deprecated name
   qmlRegisterType<PlayerQuickItem>("Konvergo", 1, 0, "KonvergoVideo");
@@ -225,7 +228,7 @@ bool PlayerComponent::componentInitialize()
   connect(SettingsComponent::Get().getSection(SETTINGS_SECTION_AUDIO),
           &SettingsSection::valuesUpdated, this, &PlayerComponent::setAudioConfiguration);
 
-  initializeCodecSupport();
+  m_codecManager->initializeCodecSupport();
   Codecs::initCodecs();
 
   QString codecInfo;
@@ -801,33 +804,25 @@ void PlayerComponent::setAudioDevice(const QString& name)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void PlayerComponent::setVolume(int volume)
 {
-  // Will fail if no audio output opened (i.e. no file playing)
-  mpv::qt::set_property(m_mpv, "volume", volume);
+  m_audioManager->setVolume(volume);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int PlayerComponent::volume()
 {
-  QVariant volume = mpv::qt::get_property(m_mpv, "volume");
-  if (volume.isValid())
-    return volume.toInt();
-  return 0;
+  return m_audioManager->volume();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void PlayerComponent::setMuted(bool muted)
 {
-  // Will fail if no audio output opened (i.e. no file playing)
-  mpv::qt::set_property(m_mpv, "mute", muted);
+  m_audioManager->setMuted(muted);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool PlayerComponent::muted()
 {
-  QVariant mute = mpv::qt::get_property(m_mpv, "mute");
-  if (mute.isValid())
-    return mute.toBool();
-  return false;
+  return m_audioManager->muted();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -965,26 +960,13 @@ void PlayerComponent::setAudioStream(const QString& audioStream)
 /////////////////////////////////////////////////////////////////////////////////////////
 void PlayerComponent::setAudioDelay(qint64 milliseconds)
 {
-  m_playbackAudioDelay = milliseconds;
-
-  double displayFps = DisplayComponent::Get().currentRefreshRate();
-  const char* audioDelaySetting = "audio_delay.normal";
-  if (fabs(displayFps - 24) < 0.5) // cover 24Hz, 23.976Hz, and values very close
-    audioDelaySetting = "audio_delay.24hz";
-  else if (fabs(displayFps - 25) < 0.5)
-    audioDelaySetting = "audio_delay.25hz";
-  else if (fabs(displayFps - 50) < 0.5)
-    audioDelaySetting = "audio_delay.50hz";
-
-  double fixedDelay =
-  SettingsComponent::Get().value(SETTINGS_SECTION_VIDEO, audioDelaySetting).toFloat();
-  mpv::qt::set_property(m_mpv, "audio-delay", (fixedDelay + m_playbackAudioDelay) / 1000.0);
+  m_audioManager->setAudioDelay(milliseconds);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void PlayerComponent::setSubtitleDelay(qint64 milliseconds)
 {
-  mpv::qt::set_property(m_mpv, "sub-delay", milliseconds / 1000.0);
+  m_subtitleManager->setSubtitleDelay(milliseconds);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -995,25 +977,7 @@ void PlayerComponent::setSubtitleDelay(qint64 milliseconds)
 void PlayerComponent::checkCurrentAudioDevice(const QSet<QString>& old_devs,
                                               const QSet<QString>& new_devs)
 {
-  QString userDevice = SettingsComponent::Get().value(SETTINGS_SECTION_AUDIO, "device").toString();
-
-  QSet<QString> removed = old_devs - new_devs;
-  QSet<QString> added = new_devs - old_devs;
-
-  QLOG_DEBUG() << "Audio devices removed:" << removed;
-  QLOG_DEBUG() << "Audio devices added:" << added;
-  QLOG_DEBUG() << "Audio device selected:" << userDevice;
-
-  if (userDevice.length())
-  {
-    if (added.contains(userDevice) || removed.contains(userDevice))
-    {
-      // The timer is for debouncing the reload. Several change notifications could
-      // come in quick succession. Also, it's possible that trying to open the
-      // reappeared audio device immediately can fail.
-      m_reloadAudioTimer.start(500);
-    }
-  }
+  m_audioManager->checkCurrentAudioDevice(old_devs, new_devs);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1285,94 +1249,25 @@ void PlayerComponent::userCommand(QString command)
 /////////////////////////////////////////////////////////////////////////////////////////
 void PlayerComponent::initializeCodecSupport()
 {
-  QMap<QString, QString> all = { { "vc1", "WVC1" }, { "mpeg2video", "MPG2" } };
-  for (auto name : all.keys())
-  {
-    bool ok = true;
-#ifdef TARGET_RPI
-    char res[100] = "";
-    bcm_host_init();
-    if (vc_gencmd(res, sizeof(res), "codec_enabled %s", all[name].toUtf8().data()))
-      res[0] = '\0'; // error
-    ok = !!strstr(res, "=enabled");
-#endif
-    m_codecSupport[name] = ok;
-    QLOG_INFO() << "Codec" << name << (ok ? "present" : "disabled");
-  }
+  m_codecManager->initializeCodecSupport();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 bool PlayerComponent::checkCodecSupport(const QString& codec)
 {
-  if (m_codecSupport.contains(codec))
-    return m_codecSupport[codec];
-  return true; // doesn't matter if unknown codecs are reported as "ok"
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
-QList<CodecDriver> convertCodecList(QVariant list, CodecType type)
-{
-  QList<CodecDriver> codecs;
-
-  foreach (const QVariant& e, list.toList())
-  {
-    QVariantMap map = e.toMap();
-
-    QString family = map["family"].toString();
-    QString codec = map["codec"].toString();
-    QString driver = map["driver"].toString();
-
-    // Only include FFmpeg codecs; exclude pseudo-codecs like spdif (on mpv versions where those
-    // were exposed).
-    if (family != "" && family != "lavc")
-      continue;
-
-    CodecDriver ncodec = {};
-    ncodec.type = type;
-    ncodec.format = codec;
-    ncodec.driver = driver;
-    ncodec.present = true;
-
-    codecs.append(ncodec);
-  }
-
-  return codecs;
+  return m_codecManager->checkCodecSupport(codec);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 QList<CodecDriver> PlayerComponent::installedCodecDrivers()
 {
-  QList<CodecDriver> codecs;
-
-  codecs.append(convertCodecList(mpv::qt::get_property(m_mpv, "decoder-list"), CodecType::Decoder));
-  codecs.append(convertCodecList(mpv::qt::get_property(m_mpv, "encoder-list"), CodecType::Encoder));
-
-  return codecs;
+  return m_codecManager->installedCodecDrivers();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 QStringList PlayerComponent::installedDecoderCodecs()
 {
-  QStringList formats;
-  bool hasPcm = false;
-
-  for (auto driver : installedCodecDrivers())
-  {
-    if (driver.type == CodecType::Decoder && checkCodecSupport(driver.format))
-    {
-      QString name = Codecs::plexNameFromFF(driver.format);
-      if (name.startsWith("pcm_") && name != "pcm_bluray" && name != "pcm_dvd")
-      {
-        if (hasPcm)
-          continue;
-        hasPcm = true;
-        name = "pcm";
-      }
-      formats.append(name);
-    }
-  }
-
-  return formats;
+  return m_codecManager->installedDecoderCodecs();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,9 @@ add_library(player STATIC
   CodecsComponent.cpp CodecsComponent.h
   OpenGLDetect.cpp OpenGLDetect.h
   QtHelper.h
+  AudioDeviceManager.cpp AudioDeviceManager.h
+  CodecManager.cpp CodecManager.h
+  SubtitleManager.cpp SubtitleManager.h
 )
 
 std_target_properties(player)
