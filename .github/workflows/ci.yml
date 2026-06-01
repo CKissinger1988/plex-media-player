@@ -25,10 +25,17 @@ jobs:
         cd build
         cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
 
-    - name: Build
+    - name: Build and Package
       run: |
         cd build
         ninja
+        ninja package
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-artifacts
+        path: build/*.deb
 
     - name: Run Clang-Tidy
       run: |
